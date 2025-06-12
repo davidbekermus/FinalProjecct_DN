@@ -20,8 +20,10 @@ const SignIn = () => {
             <label htmlFor="password">Password</label>
             <input type="password" id="password" className="signin-input" placeholder="Enter your password" />
           </div>
-
-          <button className="signin-button">Enter</button>
+          <Link to="/UiPassenger" className="forgot-password-link">
+            <button className="signin-button">Enter</button>
+          </Link>
+          
 
           <div className="signup-prompt">
             <p>Don't have an account?</p>
