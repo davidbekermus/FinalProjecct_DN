@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Header from '../Components/Header';
 import Footer from '../Components/Footer';
-
+import '../Css/UiPassenger.css'; 
 function UiPassenger() {
   const [form, setForm] = useState({
     location: '',

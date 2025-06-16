@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import Header from '../Components/Header';
 import Footer from '../Components/Footer';
 import { Link } from 'react-router-dom';
+import '../Css/SignUp.css';
 
-const SignUp = () => {
+const SignUpDriver = () => {
 const [formData, setFormData] = useState({})
 const [error, setError] = useState('');
 
@@ -128,7 +129,7 @@ const [error, setError] = useState('');
 
           <div className="signup-footer">
             <p>Already have an account?</p>
-            <Link to="/SignIn" className="signup-link">Sign in</Link>
+            <Link to="/SignInDriver" className="signup-link">Sign in</Link>
           </div>
         </form>
       </main>
@@ -137,4 +138,4 @@ const [error, setError] = useState('');
   );
 };
 
-export default SignUp;
+export default SignUpDriver;

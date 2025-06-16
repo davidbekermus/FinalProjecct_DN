@@ -2,14 +2,15 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../Components/Header';
 import Footer from '../Components/Footer';
+import '../Css/SignIn.css';
 
-const SignIn = () => {
+const SignInTraveler = () => {
   return (
     <>
       <Header title="Sign In" />
       <main className="signin-main">
         <div className="signin-container">
-          <h2 className="signin-title">Welcome Back</h2>
+          <h2 className="signin-title">Welcome Back Traveler</h2>
           
           <div className="input-group">
             <label htmlFor="username">Username</label>
@@ -27,7 +28,7 @@ const SignIn = () => {
 
           <div className="signup-prompt">
             <p>Don't have an account?</p>
-            <Link to="/SignUp" className="signup-link">Sign up</Link>
+            <Link to="/SignUpTraveler" className="signup-link">Sign up</Link>
           </div>
         </div>
       </main>
@@ -36,4 +37,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default SignInTraveler;

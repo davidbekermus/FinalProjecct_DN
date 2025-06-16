@@ -1,0 +1,38 @@
+.choose-signin-background {
+  background-image: url('/FinalProjectBackgroundPic.jpg'); /* Make sure the image is in your public folder */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  image-rendering: auto;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.signin-button {
+  padding: 15px 40px;
+  font-size: 20px;
+  color: white;
+  background: rgba(255, 69, 0, 0.7); /* Orange-red, semi-transparent */
+  border: none;
+  border-radius: 10px;
+  text-decoration: none;
+  text-align: center;
+  backdrop-filter: blur(2px);
+  transition: all 0.3s ease-in-out;
+}
+
+.signin-button:hover {
+  backdrop-filter: blur(8px);
+  background: rgba(255, 69, 0, 0.4);
+  transform: scale(1.05);
+  color: #fff;
+  cursor: pointer;
+}
