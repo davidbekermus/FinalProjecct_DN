@@ -58,7 +58,8 @@ const SignUpTraveler = () => {
             value={formData.firstName || ''} 
             className="signup-input"
             onChange={handleChange} 
-            placeholder="Enter your first name" />
+            placeholder="Enter your first name"
+            required />
           </div>
 
           <div className="signup-group">
@@ -69,7 +70,8 @@ const SignUpTraveler = () => {
             value={formData.lastName || ''} 
             className="signup-input"
             onChange={handleChange} 
-            placeholder="Enter your last name" />
+            placeholder="Enter your last name"
+            required />
           </div>
 
           <div className="signup-group">
@@ -80,7 +82,8 @@ const SignUpTraveler = () => {
             value={formData.email || ''}
             onChange={handleChange} 
             className="signup-input" 
-            placeholder="Enter your email" />
+            placeholder="Enter your email"
+            required />
           </div>
 
           <div className="signup-group">
@@ -91,7 +94,8 @@ const SignUpTraveler = () => {
             value={formData.phone || ''}
             onChange={handleChange} 
             className="signup-input" 
-            placeholder="Enter your phone number" />
+            placeholder="Enter your phone number"
+            required />
           </div>
 
           <div className="signup-group">
@@ -102,7 +106,8 @@ const SignUpTraveler = () => {
             value={formData.username || ''}
             onChange={handleChange}
             className="signup-input" 
-            placeholder="Choose a username" />
+            placeholder="Choose a username"
+            required />
           </div>
 
           <div className="signup-group">
@@ -113,7 +118,8 @@ const SignUpTraveler = () => {
             value={formData.password || ''}
             onChange={handleChange} 
             className="signup-input" 
-            placeholder="Create a password" />
+            placeholder="Create a password"
+            required />
           </div>
 
           <div className="signup-group">
@@ -124,7 +130,8 @@ const SignUpTraveler = () => {
             value={formData.confirmPassword || ''}
             onChange={handleChange} 
             className="signup-input" 
-            placeholder="Re-enter your password" />
+            placeholder="Re-enter your password"
+            required />
           </div>
           {error && <p style={{ color: "red" }}>{error}</p>}
           <button className="signup-button" type="submit" >Register</button>

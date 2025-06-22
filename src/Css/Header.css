@@ -7,7 +7,7 @@
 
 .modern-header {
   background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
-  padding: 1rem 2rem;
+  padding: 1rem 0rem; /* Reduced horizontal padding to bring logo closer to the edge */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   position: fixed;
   top: 0;
@@ -17,7 +17,6 @@
   overflow: hidden;
 }
 
-/* This is the white overlay that fades in on scroll */
 .header-overlay {
   position: absolute;
   top: 0;
@@ -37,7 +36,8 @@
   justify-content: space-between;
   align-items: center;
   position: relative;
-  z-index: 2; /* ensure content is above overlay */
+  z-index: 2;
+  padding: 0 1rem; /* Small side padding */
 }
 
 .logo-title-group {
@@ -48,10 +48,11 @@
 
 .logo-link {
   display: inline-block;
+  margin-left: 0.25rem; /* Minimal left margin */
 }
 
 .logo-image {
-  height: 55px;
+  height: 70px; /* Increased logo size */
   width: auto;
   margin-right: 0.75rem;
 }

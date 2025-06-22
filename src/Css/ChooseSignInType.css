@@ -1,5 +1,5 @@
 .choose-signin-background {
-  background-image: url('/FinalProjectBackgroundPic.jpg'); /* Make sure the image is in your public folder */
+  background-image: url('/public/finalProjSignInImg.png'); /* Make sure the image is in your public folder */
   background-size: cover;
   background-position: center;
   background-attachment: fixed;

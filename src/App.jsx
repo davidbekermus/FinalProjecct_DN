@@ -6,7 +6,7 @@ import SignInTraveler from './Pages/SignInTraveler'
 import ChooseSignInType from './Pages/ChooseSignInType'
 import UiPassenger from './Pages/UiPassenger'
 import SignUpDriver from './Pages/SignUPDriver'
-import SignUpTraveler from './Pages/signUpTraveler'
+import SignUpTraveler from './Pages/SignUpTraveler'
 
 function App() {
  
