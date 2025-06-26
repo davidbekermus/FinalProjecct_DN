@@ -7,6 +7,10 @@ import ChooseSignInType from './Pages/ChooseSignInType'
 import UiPassenger from './Pages/UiPassenger'
 import SignUpDriver from './Pages/SignUPDriver'
 import SignUpTraveler from './Pages/SignUpTraveler'
+import UiDriver from './Pages/UiDriver'
+import BusInfo from './Pages/BusInfo'
+import BusStopInfo from './Pages/BusStopInfo'
+import UiDriver_FinalInfo from './Pages/Uidriver_FinalInfo'
 
 function App() {
  
@@ -21,6 +25,10 @@ function App() {
           <Route path = '/SignUpTraveler' element = {<SignUpTraveler/>}/>
           <Route path = '/ChooseSignInType' element = {<ChooseSignInType/>}/>
           <Route path = '/UiPassenger' element = {<UiPassenger/>}/>
+          <Route path = '/UiDriver' element = {<UiDriver/>}/>
+          <Route path = '/UiDriver_FinalInfo' element = {<UiDriver_FinalInfo/>}/>
+          <Route path = '/BusInfo' element = {<BusInfo/>} />
+          <Route path = '/BusStopInfo' element = {<BusStopInfo/>} />
       </Routes>
     </BrowserRouter>
     </>

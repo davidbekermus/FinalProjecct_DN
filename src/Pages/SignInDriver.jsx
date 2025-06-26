@@ -27,7 +27,7 @@ const SignInDriver = () => {
     }
     setError('');
     console.log('Form submitted:', formData);
-    navigate('/UiPassenger'); // Assuming you want to navigate to UiPassenger after successful sign-in
+    navigate('/UiDriver'); // Assuming you want to navigate to UiPassenger after successful sign-in
   }
   return (
         <>
