@@ -1,14 +1,9 @@
 import { useState } from 'react';
 import Header from '../Components/Header';
 import Footer from '../Components/Footer';
-
+import '../Css/UiPassenger.css'; 
 function UiPassenger() {
-  const [form, setForm] = useState({
-    location: '',
-    destination: '',
-    company: '',
-    line: '',
-  });
+  const [form, setForm] = useState({});
 
   const [locationLoading, setLocationLoading] = useState(false);
   const [error, setError] = useState('');

@@ -1,4 +1,5 @@
-/* Header.css */
+/* /* Header.css */
+@import "tailwindcss";
 
 .header {
   background: linear-gradient(90deg, #4f46e5, #3b82f6);
@@ -344,4 +345,3 @@
   font-size: 0.9rem;
   margin-top: 0.25rem;
 }
-
