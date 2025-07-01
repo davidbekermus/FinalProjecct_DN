@@ -27,7 +27,8 @@ const SignInDriver = () => {
     }
     setError('');
     console.log('Form submitted:', formData);
-    navigate('/UiDriver'); // Assuming you want to navigate to UiPassenger after successful sign-in
+    // still have to check if the user is in the DB 
+    navigate('/UiDriver');
   }
   return (
         <>

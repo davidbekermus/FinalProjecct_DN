@@ -33,6 +33,8 @@ const SignUpTraveler = () => {
         }else {
           setError('');
         console.log('Form submitted');
+        // still have to add to the DB the nw user
+        navigate('/SignInTraveler');
       }
     }  
     

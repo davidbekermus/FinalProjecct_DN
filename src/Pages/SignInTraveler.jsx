@@ -27,7 +27,8 @@ const SignInTraveler = () => {
     }
     setError('');
     console.log('Form submitted:', formData);
-    navigate('/UiPassenger'); // Assuming you want to navigate to UiPassenger after successful sign-in
+    // still have to check if the user is in the DB
+    navigate('/UiPassenger'); 
   };
   return (
     <>
@@ -44,7 +45,8 @@ const SignInTraveler = () => {
             value={formData.username || ''}
             onChange={handleChange}
             className="signin-input"
-            placeholder="Enter your username" />
+            placeholder="Enter your username"
+            required />
           </div>
 
           <div className="input-group">
@@ -55,7 +57,8 @@ const SignInTraveler = () => {
             value={formData.password || ''}
             onChange={handleChange}
             className="signin-input" 
-            placeholder="Enter your password" />
+            placeholder="Enter your password"
+            required />
           </div>
           {error && <p className="error-message">{error}</p>}
           <button className="signin-button">Enter</button>
