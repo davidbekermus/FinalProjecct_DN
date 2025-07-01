@@ -11,6 +11,7 @@ import UiDriver from './Pages/UiDriver'
 import BusInfo from './Pages/BusInfo'
 import BusStopInfo from './Pages/BusStopInfo'
 import UiDriver_FinalInfo from './Pages/Uidriver_FinalInfo'
+import CompanyBusLines from './Pages/CompanyBusLines'
 
 function App() {
  
@@ -29,6 +30,7 @@ function App() {
           <Route path = '/UiDriver_FinalInfo' element = {<UiDriver_FinalInfo/>}/>
           <Route path = '/BusInfo' element = {<BusInfo/>} />
           <Route path = '/BusStopInfo' element = {<BusStopInfo/>} />
+          <Route path = '/company-bus-lines/:operatorRef' element = {<CompanyBusLines />} />
       </Routes>
     </BrowserRouter>
     </>

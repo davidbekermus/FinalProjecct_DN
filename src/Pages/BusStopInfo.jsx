@@ -12,7 +12,7 @@ const BusStopInfo = () => {
     console.log('Searching for bus stop:', searchTerm);
   };
 
-  return (
+  return ( 
     <>
       <Header title="Bus Stop Information" />
       <main className="bus-stop-info-main">

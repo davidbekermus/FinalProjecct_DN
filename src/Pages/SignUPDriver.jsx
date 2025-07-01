@@ -32,6 +32,7 @@ const [error, setError] = useState('');
     }else {
       setError('');
     console.log('Form submitted');
+    // still have to add the the DB the new user
     navigator('/SignInDriver');
   }
 }  
