@@ -28,8 +28,9 @@ const CompanyBusLines = () => {
         let offset = 0;
         const limit = 1000;
         let hasMore = true;
+        const maxOffset = 100000;
 
-        while (hasMore && offset < 60000) {
+        while (hasMore && offset < maxOffset) {
           const response = await fetch(
             `https://open-bus-stride-api.hasadna.org.il/gtfs_routes/list?limit=${limit}&offset=${offset}&order_by=id%20asc`
           );
@@ -77,10 +78,15 @@ const CompanyBusLines = () => {
 
   const filteredLines = useMemo(() => {
     const term = searchTerm.toLowerCase();
+    const termAsNumber = parseInt(term);
     return allBusLines.filter(line => {
+      const routeShortName = line.route_short_name?.toString() || '';
+      const routeLongName = line.route_long_name?.toLowerCase() || '';
       return (
-        (line.route_short_name && line.route_short_name.toString().toLowerCase().includes(term)) ||
-        (line.route_long_name && line.route_long_name.toLowerCase().includes(term))
+        // Check if route_short_name matches the search term as a number
+        (routeShortName && (parseInt(routeShortName) === termAsNumber || routeShortName.toLowerCase().includes(term))) ||
+        // Check if route_long_name contains the search term
+        (routeLongName && routeLongName.includes(term))
       );
     });
   }, [searchTerm, allBusLines]);
@@ -101,7 +107,7 @@ const CompanyBusLines = () => {
 
           <input
             type="text"
-            placeholder="Search route name..."
+            placeholder="Search route number..."
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
