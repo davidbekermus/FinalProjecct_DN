@@ -1,38 +1,30 @@
-.bus-info-main {
+.station-search-main {
   min-height: 100vh;
-  background-color: #f5f5f5;
-  padding: 2rem 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem 1rem;
+  direction: rtl;
 }
 
-.bus-info-container {
-  max-width: 800px;
+.station-search-container {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  min-height: 80vh;
 }
 
-.bus-info-container h2 {
+.station-search-title {
   text-align: center;
-  color: white;
+  color: #333;
   font-size: 2.5rem;
   margin-bottom: 2rem;
   font-weight: 700;
-}
-
-/* Station Search Section */
-.station-search-section {
-  background: white;
-  border-radius: 20px;
-  padding: 2rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-}
-
-.station-search-section h3 {
-  text-align: center;
-  color: #333;
-  font-size: 1.8rem;
-  margin-bottom: 1.5rem;
-  font-weight: 600;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Search Type Selector */
@@ -188,7 +180,7 @@
   margin-top: 2rem;
 }
 
-.search-results h4 {
+.search-results h3 {
   text-align: center;
   color: #333;
   margin-bottom: 1.5rem;
@@ -218,7 +210,7 @@
   box-shadow: 0 15px 30px rgba(102, 126, 234, 0.2);
 }
 
-.station-card h5 {
+.station-card h4 {
   color: #333;
   margin-bottom: 0.5rem;
   font-size: 1.2rem;
@@ -280,7 +272,7 @@
   border-radius: 15px;
 }
 
-.station-info h4 {
+.station-info h3 {
   color: #333;
   font-size: 2rem;
   margin-bottom: 0.5rem;
@@ -290,7 +282,7 @@
   margin-bottom: 2rem;
 }
 
-.lines-section h5 {
+.lines-section h4 {
   color: #333;
   margin-bottom: 1rem;
   font-size: 1.3rem;
@@ -319,166 +311,37 @@
   transform: translateY(-2px);
 }
 
-/* Bus Companies Section */
-.bus-companies-section {
-  background: white;
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-}
-
-.bus-companies-section h3 {
+.action-buttons {
   text-align: center;
-  color: #333;
-  font-size: 1.8rem;
-  margin-bottom: 1.5rem;
-  font-weight: 600;
+  margin-top: 2rem;
 }
 
-.bus-info-search {
-  display: flex;
-  gap: 1rem;
-  margin: 2rem 0;
-}
-
-.bus-info-search-input {
-  flex: 1;
-  padding: 1rem;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-}
-
-.bus-info-search-input:focus {
-  outline: none;
-  border-color: #2c3e50;
-}
-
-.bus-info-search-button {
-  padding: 1rem 2rem;
-  background-color: #2c3e50;
+.view-bus-info-button {
+  background: linear-gradient(135deg, #28a745, #20c997);
   color: white;
   border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s ease;
-}
-
-.bus-info-search-button:hover {
-  background-color: #34495e;
-}
-
-.bus-info-error {
-  background-color: #fee2e2;
-  border: 1px solid #f56565;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  color: #c53030;
-  font-size: 0.9rem;
-  animation: slideIn 0.3s ease-out;
-}
-
-.bus-info-loading {
-  margin-top: 2rem;
-  padding: 1.5rem;
-  background: white;
-  border-radius: 8px;
-  text-align: center;
-  color: #6c757d;
+  padding: 1rem 2rem;
+  border-radius: 15px;
   font-size: 1.1rem;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateY(-10px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-/* Bus Company List Styling */
-.bus-info-results {
-  margin-top: 2rem;
-  padding: 1.5rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.bus-info-results h3 {
-  color: #2c3e50;
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
-}
-
-.bus-info-results ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-}
-
-.bus-info-results li {
-  background: linear-gradient(
-    to right,
-    rgba(30, 58, 138, 0.1),
-    rgba(59, 130, 246, 0.1)
-  );
-  border-radius: 6px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  padding: 1.5rem;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  min-height: 100px;
-  border: 1px solid rgba(30, 58, 138, 0.1);
-}
-
-.bus-info-results li:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.1);
-  border-color: rgba(30, 58, 138, 0.2);
-}
-
-.bus-info-results li h4 {
-  color: #2c3e50;
-  margin: 0 0 0.5rem 0;
-  font-size: 1.2rem;
   font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.bus-info-results li p {
-  color: #6c757d;
-  margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.4;
+.view-bus-info-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
 }
 
-/* Responsive design for smaller screens */
-@media (max-width: 1024px) {
-  .bus-info-results ul {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
+/* Responsive Design */
 @media (max-width: 768px) {
-  .bus-info-container {
-    padding: 0 0.5rem;
+  .station-search-container {
+    padding: 1rem;
+    margin: 1rem;
   }
 
-  .station-search-section,
-  .bus-companies-section {
-    padding: 1rem;
+  .station-search-title {
+    font-size: 2rem;
   }
 
   .search-type-selector {
@@ -497,64 +360,24 @@
   .lines-grid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
-
-  .bus-info-results ul {
-    grid-template-columns: 1fr;
-  }
-
-  .bus-info-search {
-    flex-direction: column;
-  }
 }
 
 @media (max-width: 480px) {
-  .bus-info-container h2 {
-    font-size: 2rem;
+  .station-search-main {
+    padding: 1rem 0.5rem;
+  }
+
+  .station-search-container {
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+
+  .station-search-title {
+    font-size: 1.8rem;
   }
 
   .search-type-btn {
     min-width: 200px;
     padding: 0.8rem 1.5rem;
   }
-}
-
-/* Route Search & Check-in Styles */
-.route-list {
-  list-style: none;
-  padding: 0;
-  margin: 18px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.route-station {
-  background: #f7fafd;
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 1rem;
-  transition: background 0.2s;
-}
-.current-station {
-  background: #fff9c4 !important;
-  color: #bfa100;
-  font-weight: bold;
-  border: 1.5px solid #ffe082;
-}
-.checkin-btn {
-  background: linear-gradient(135deg, #ffd600, #ffe082);
-  color: #333;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 28px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 2px 8px #ffd60033;
-  transition: background 0.2s, transform 0.2s;
-}
-.checkin-btn:disabled {
-  background: #eee;
-  color: #aaa;
-  cursor: not-allowed;
-  box-shadow: none;
 }

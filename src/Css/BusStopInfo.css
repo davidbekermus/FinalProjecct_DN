@@ -1,46 +1,259 @@
+:root {
+  --primary: #667eea;
+  --secondary: #764ba2;
+  --light-bg: #f5f7fa;
+  --gradient-bg: linear-gradient(135deg, var(--light-bg) 0%, #c3cfe2 100%);
+  --card-bg: #ffffff;
+  --text-dark: #222;
+  --text-muted: #555;
+  --accent: #4f46e5;
+  --border-color: #e3eafc;
+  --shadow: 0 4px 32px rgba(25, 118, 210, 0.2);
+  --radius: 24px;
+}
+
 .bus-stop-info-main {
   min-height: 100vh;
-  background-color: #f5f5f5;
-  padding: 2rem 0;
+  background: var(--gradient-bg);
+  padding: 60px 30px;
+  box-sizing: border-box;
 }
 
 .bus-stop-info-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 1rem;
+  max-width: 960px;
+  margin: auto;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 48px 40px;
+  transition: box-shadow 0.3s;
 }
 
-.bus-stop-info-search {
+h2 {
+  text-align: center;
+  margin-bottom: 36px;
+  color: var(--accent);
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.search-type-bar {
   display: flex;
-  gap: 1rem;
-  margin: 2rem 0;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
 }
 
-.bus-stop-info-search-input {
-  flex: 1;
-  padding: 1rem;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-}
-
-.bus-stop-info-search-input:focus {
-  outline: none;
-  border-color: #2c3e50;
-}
-
-.bus-stop-info-search-button {
-  padding: 1rem 2rem;
-  background-color: #2c3e50;
-  color: white;
+.search-type-bar button {
+  padding: 12px 30px;
   border: none;
-  border-radius: 8px;
+  border-radius: 24px;
+  background: var(--border-color);
+  color: var(--text-dark);
+  font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.1);
 }
 
-.bus-stop-info-search-button:hover {
-  background-color: #34495e;
+.search-type-bar button.active,
+.search-type-bar button:hover {
+  background: linear-gradient(90deg, var(--primary) 60%, var(--secondary) 100%);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(102, 126, 234, 0.4);
+}
+
+.bus-stop-search-form {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 26px;
+}
+
+.bus-stop-input {
+  flex: 1 1 250px;
+  padding: 14px 20px;
+  border-radius: 14px;
+  border: 1.5px solid #ccc;
+  font-size: 1.1rem;
+  background: #f9fbfd;
+  transition: border 0.3s;
+}
+
+.bus-stop-input:focus {
+  border-color: var(--accent);
+  background: #fff;
+  outline: none;
+}
+
+.search-btn {
+  padding: 14px 32px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(90deg, var(--primary) 60%, var(--secondary) 100%);
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s;
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.2);
+}
+
+.search-btn:disabled {
+  background: #b0b0b0;
+  cursor: not-allowed;
+}
+
+.location-hint,
+.error-message,
+.loading-message,
+.empty-message {
+  text-align: center;
+  font-size: 1.1rem;
+  margin-top: 12px;
+}
+
+.error-message { color: #e74c3c; font-weight: 600; }
+.loading-message { color: var(--primary); font-weight: 600; }
+.empty-message { color: #888; font-size: 1.2rem; }
+
+.stations-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.station-card {
+  background: linear-gradient(90deg, var(--border-color) 60%, #f7fafd 100%);
+  border-radius: 20px;
+  padding: 26px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  border: 1.5px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.station-card:hover {
+  background: linear-gradient(90deg, var(--primary) 60%, var(--secondary) 100%);
+  color: #fff;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4);
+  transform: translateY(-3px) scale(1.02);
+}
+
+.station-card-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.station-icon {
+  font-size: 2.4rem;
+  background: #fff;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
+  color: var(--primary);
+}
+
+.station-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.station-city {
+  color: var(--primary);
+  font-size: 1.05rem;
+  margin-bottom: 2px;
+}
+
+.station-distance,
+.station-hint {
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.selected-station-card {
+  background: var(--border-color);
+  border-radius: 20px;
+  padding: 30px 24px;
+  box-shadow: var(--shadow);
+  margin-top: 24px;
+  text-align: center;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-bottom: 16px;
+  transition: color 0.3s;
+  font-weight: 600;
+}
+
+.back-btn:hover {
+  color: #0d47a1;
+}
+
+.lines-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.line-card {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  padding: 1.2rem;
+  border-radius: 14px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+  box-shadow: 0 3px 10px rgba(102, 126, 234, 0.2);
+  transition: transform 0.3s, background 0.3s;
+}
+
+.line-card:hover {
+  transform: translateY(-3px) scale(1.04);
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+}
+
+@media (max-width: 768px) {
+  .bus-stop-info-container {
+    padding: 24px;
+    margin: 20px;
+  }
+  .stations-list {
+    gap: 16px;
+  }
+  .lines-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .bus-stop-info-main {
+    padding: 20px 12px;
+  }
+  .bus-stop-info-container {
+    padding: 20px;
+    margin: 12px;
+  }
+  .bus-stop-info-container h2 {
+    font-size: 1.7rem;
+  }
+  .lines-grid {
+    grid-template-columns: 1fr;
+  }
 }
