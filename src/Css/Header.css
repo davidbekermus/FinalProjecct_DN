@@ -1,12 +1,16 @@
 :root {
   --gradient-start: #1e3a8a; /* deep blue */
-  --gradient-end: #3b82f6;   /* lighter blue */
+  --gradient-end: #3b82f6; /* lighter blue */
   --text-light: #ffffff;
   --hover-accent: #bfdbfe;
 }
 
 .modern-header {
-  background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+  background: linear-gradient(
+    to right,
+    var(--gradient-start),
+    var(--gradient-end)
+  );
   padding: 1rem 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   position: fixed;
@@ -80,7 +84,36 @@
   color: var(--text-light);
   font-weight: 500;
   font-size: 1.05rem;
-  transition: color 0.3s ease;
+  transition: color 0.3s ease, background 0.3s;
+  padding: 0.3em 0.9em;
+  border-radius: 4px;
+}
+
+/* Make Login link bold and with a subtle background on hover */
+.nav-link[href="/Login"] {
+  font-weight: 700;
+  border: 1.5px solid #fff3;
+  background: rgba(255, 255, 255, 0.08);
+}
+.nav-link[href="/Login"]:hover {
+  background: var(--hover-accent);
+  color: #1e3a8a;
+}
+
+/* Make Sign Up look like a button */
+.nav-link[href="/SignUp"] {
+  background: #fff;
+  color: #1e3a8a;
+  font-weight: 700;
+  border-radius: 20px;
+  border: 2px solid #fff;
+  margin-left: 0.5em;
+  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.08);
+}
+.nav-link[href="/SignUp"]:hover {
+  background: #3b82f6;
+  color: #fff;
+  border-color: #3b82f6;
 }
 
 .nav-link:hover {
@@ -114,7 +147,7 @@
   position: absolute;
   background-color: white;
   min-width: 160px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   z-index: 9999;
   right: 0;
   border-radius: 4px;

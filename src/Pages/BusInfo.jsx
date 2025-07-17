@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import Header from '../Components/Header';
-import Footer from '../Components/Footer';
-import '../Css/BusInfo.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Header from "../Components/Header";
+import Footer from "../Components/Footer";
+import "../Css/BusInfo.css";
 
 const BusInfo = () => {
+  const navigate = useNavigate();
   const [busData, setBusData] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState(null);
 
   // Function to remove duplicate bus companies
   const removeDuplicates = (data) => {
     const seen = new Set();
-    return data.filter(company => {
-      const key = company.agency_name?.toLowerCase() || '';
+    return data.filter((company) => {
+      const key = company.agency_name?.toLowerCase() || "";
       if (seen.has(key)) {
         return false;
       }
@@ -24,56 +26,49 @@ const BusInfo = () => {
   useEffect(() => {
     const fetchBusData = async () => {
       try {
-        const response = await fetch('https://open-bus-stride-api.hasadna.org.il/gtfs_agencies/list');
+        const response = await fetch(
+          "https://open-bus-stride-api.hasadna.org.il/gtfs_agencies/list"
+        );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log('API Response:', data); // Log the full response
-        
-        // Check if data is an array directly
         if (Array.isArray(data)) {
           const uniqueData = removeDuplicates(data);
           setBusData(uniqueData);
         } else {
-          console.error('Unexpected data format:', data);
-          setError('Unexpected response format from API');
+          setError("Unexpected response format from API");
         }
       } catch (error) {
-        console.error('Error:', error);
-        setError(error.message || 'An error occurred while fetching bus data');
+        setError(error.message || "An error occurred while fetching bus data");
       }
     };
-
     fetchBusData();
   }, []);
-  
+
   const handleSearch = (e) => {
     e.preventDefault();
-    // Filter bus companies based on search term
-    const filteredData = busData.filter(company => {
+    const filteredData = busData.filter((company) => {
       const searchLower = searchTerm.toLowerCase();
-      const name = company.agency_name?.toLowerCase() || '';
-      const url = company.agency_url?.toLowerCase() || '';
-      
+      const name = company.agency_name?.toLowerCase() || "";
+      const url = company.agency_url?.toLowerCase() || "";
       return name.includes(searchLower) || url.includes(searchLower);
     });
-
     if (filteredData.length === 0) {
-      setError('No bus companies found matching your search');
+      setError("No bus companies found matching your search");
     } else {
       setError(null);
     }
   };
 
-  // Filter the displayed data based on search term
-  const displayedData = searchTerm ? busData.filter(company => {
-    const searchLower = searchTerm.toLowerCase();
-    const name = company.agency_name?.toLowerCase() || '';
-    const url = company.agency_url?.toLowerCase() || '';
-    
-    return name.includes(searchLower) || url.includes(searchLower);
-  }) : busData;
+  const displayedData = searchTerm
+    ? busData.filter((company) => {
+        const searchLower = searchTerm.toLowerCase();
+        const name = company.agency_name?.toLowerCase() || "";
+        const url = company.agency_url?.toLowerCase() || "";
+        return name.includes(searchLower) || url.includes(searchLower);
+      })
+    : busData;
 
   return (
     <>
@@ -115,7 +110,6 @@ const BusInfo = () => {
               <p>Loading bus companies...</p>
             </div>
           ) : null}
-          {/* Search results will be displayed here */}
         </div>
       </main>
       <Footer />
