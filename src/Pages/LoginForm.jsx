@@ -27,7 +27,9 @@ const LoginForm = () => {
       );
       setError("");
       localStorage.setItem("token", data.token);
-      if (data.user.role === "driver") {
+      if (data.user.role === "admin") {
+        nav("/AdminPage");
+      } else if (data.user.role === "driver") {
         nav("/UiDriver");
       } else {
         nav("/UiPassenger");

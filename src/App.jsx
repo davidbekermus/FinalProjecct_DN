@@ -10,6 +10,7 @@ import LoginForm from "./Pages/LoginForm";
 import SignupForm from "./Pages/SignupForm";
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
+import AdminPage from "./Pages/AdminPage";
 
 function App() {
   return (
@@ -91,6 +92,16 @@ function App() {
             <>
               <Header title="BusCheck - Bus Stop Info" />
               <BusStopInfo />
+              <Footer />
+            </>
+          }
+        />
+        <Route
+          path="/AdminPage"
+          element={
+            <>
+              <Header title="BusCheck - Admin" />
+              <AdminPage />
               <Footer />
             </>
           }

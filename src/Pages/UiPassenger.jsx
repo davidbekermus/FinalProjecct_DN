@@ -62,7 +62,9 @@ function UiPassenger() {
       <Header title="Transportation Planner" />
       <main className="signin-main">
         <div className="signin-container">
-          <h2 className="signin-title">Transportation Planner</h2>
+          <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>
+            ברוך השב נוסע
+          </h2>
           <div style={{ textAlign: "center", marginBottom: "2rem" }}>
             <button
               onClick={handleStationSearch}
