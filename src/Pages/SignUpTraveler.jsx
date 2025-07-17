@@ -3,16 +3,17 @@ import Header from '../Components/Header';
 import Footer from '../Components/Footer';
 import '../Css/SignUp.css';
 import  { useState } from 'react';
-import { Link } from 'react-router-dom';
-
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const SignUpTraveler = () => {
     const [formData, setFormData] = useState({})
     const [error, setError] = useState('');
+    const navigate = useNavigate();
     
-      const handleSubmit = (e) => {
+      const handleSubmit = async (e) => {
         e.preventDefault();
-        if (formData.password < 8){
+        if (formData.password.length < 8){
           setError('Password must be at least 8 characters long');
           return;
         }else if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone || !formData.username || !formData.password || !formData.confirmPassword) {
@@ -32,11 +33,27 @@ const SignUpTraveler = () => {
           return;
         }else {
           setError('');
-        console.log('Form submitted');
-        // still have to add to the DB the nw user
-        navigate('/SignInTraveler');
-      }
-    }  
+          try {
+            const response = await axios.post('http://localhost:3000/api/signUpTraveler', {
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              email: formData.email,
+              phone: formData.phone,
+              username: formData.username,
+              password: formData.password
+            });
+            
+            if (response.data.success) {
+              navigate('/SignInTraveler');
+            } else {
+              setError('Failed to create account. Please try again.');
+            }
+          } catch (error) {
+            setError('An error occurred while creating your account. Please try again.');
+            console.error('Signup error:', error);
+          }
+        }
+      }  
     
       const handleChange = (e) => {
         setFormData({
