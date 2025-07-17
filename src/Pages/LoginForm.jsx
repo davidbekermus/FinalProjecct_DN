@@ -2,6 +2,8 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../Css/SignIn.css";
+import Footer from "../Components/Footer";
+import Header from "../Components/Header";
 
 const LoginForm = () => {
   const nav = useNavigate();
@@ -46,51 +48,59 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="signin-main">
-      <div className="signin-container">
-        <h2 className="signin-title">Login</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="input-group">
-            <label htmlFor="email">Email:</label>
-            <input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="signin-input"
-              placeholder="Enter your email"
-            />
-          </div>
-          <div className="input-group">
-            <label htmlFor="password">Password:</label>
-            <input
-              id="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="signin-input"
-              placeholder="Enter your password"
-            />
-          </div>
-          <button type="submit" className="signin-button" disabled={isLoading}>
-            {isLoading ? "Loading..." : "Login"}
-          </button>
-          {error && (
-            <p style={{ color: "red", textAlign: "center" }}>{error}</p>
-          )}
-          <div
-            className="signup-prompt"
-            style={{ textAlign: "center", marginTop: "1rem" }}
-          >
-            <p>Don't have an account?</p>
-            <a href="/SignUp" className="signup-link">
-              Sign up
-            </a>
-          </div>
-        </form>
+    <div>
+      <Header title="Login" />
+      <div className="signin-main">
+        <div className="signin-container">
+          <h2 className="signin-title">Login</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="input-group">
+              <label htmlFor="email">Email:</label>
+              <input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="signin-input"
+                placeholder="Enter your email"
+              />
+            </div>
+            <div className="input-group">
+              <label htmlFor="password">Password:</label>
+              <input
+                id="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                className="signin-input"
+                placeholder="Enter your password"
+              />
+            </div>
+            <button
+              type="submit"
+              className="signin-button"
+              disabled={isLoading}
+            >
+              {isLoading ? "Loading..." : "Login"}
+            </button>
+            {error && (
+              <p style={{ color: "red", textAlign: "center" }}>{error}</p>
+            )}
+            <div
+              className="signup-prompt"
+              style={{ textAlign: "center", marginTop: "1rem" }}
+            >
+              <p>Don't have an account?</p>
+              <a href="/SignUp" className="signup-link">
+                Sign up
+              </a>
+            </div>
+          </form>
+        </div>
       </div>
+      <Footer />
     </div>
   );
 };

@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Header from "../Components/Header";
-import Footer from "../Components/Footer";
-import "../Css/BusInfo.css";
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import Header from '../Components/Header';
+import Footer from '../Components/Footer';
+import '../Css/BusInfo.css';
 
 const BusInfo = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [busData, setBusData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState(null);
 
-  // Function to remove duplicate bus companies
+
   const removeDuplicates = (data) => {
     const seen = new Set();
     return data.filter((company) => {
@@ -33,6 +34,8 @@ const BusInfo = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+        console.log('API Response:', data);
+        
         if (Array.isArray(data)) {
           const uniqueData = removeDuplicates(data);
           setBusData(uniqueData);
@@ -44,34 +47,28 @@ const BusInfo = () => {
       }
     };
     fetchBusData();
-  }, []);
-
+  }, []);   
+  
   const handleSearch = (e) => {
     e.preventDefault();
-    const filteredData = busData.filter((company) => {
-      const searchLower = searchTerm.toLowerCase();
-      const name = company.agency_name?.toLowerCase() || "";
-      const url = company.agency_url?.toLowerCase() || "";
-      return name.includes(searchLower) || url.includes(searchLower);
-    });
-    if (filteredData.length === 0) {
-      setError("No bus companies found matching your search");
-    } else {
-      setError(null);
-    }
+    setError('');
   };
 
-  const displayedData = searchTerm
-    ? busData.filter((company) => {
-        const searchLower = searchTerm.toLowerCase();
-        const name = company.agency_name?.toLowerCase() || "";
-        const url = company.agency_url?.toLowerCase() || "";
-        return name.includes(searchLower) || url.includes(searchLower);
-      })
-    : busData;
+  const filteredData = busData.filter(company => {
+    const searchLower = searchTerm.toLowerCase();
+    const name = company.agency_name?.toLowerCase() || '';
+    const url = company.agency_url?.toLowerCase() || '';
+    
+    return name.includes(searchLower) || url.includes(searchLower);
+  });
+
+  const displayedData = searchTerm ? filteredData : busData;
 
   return (
     <>
+      {location.state?.companyName && (
+        <p>You clicked on: {location.state.companyName}</p>
+      )}
       <Header title="Bus Information" />
       <main className="bus-info-main">
         <div className="bus-info-container">
@@ -98,7 +95,14 @@ const BusInfo = () => {
               <h3>Bus Companies</h3>
               <ul>
                 {displayedData.map((company, index) => (
-                  <li key={index}>
+                  <li key={index} className="company-item" onClick={() => {
+                    console.log('Navigating to:', `/company-bus-lines/${encodeURIComponent(company.operator_ref)}`);
+                    navigate(`/company-bus-lines/${encodeURIComponent(company.operator_ref)}`, {
+                      state: { 
+                        companyName: company.agency_name
+                      }
+                    });
+                  }}>
                     <h4>{company.agency_name}</h4>
                     <p>{company.agency_url}</p>
                   </li>

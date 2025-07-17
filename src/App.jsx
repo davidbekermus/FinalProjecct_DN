@@ -11,6 +11,7 @@ import SignupForm from "./Pages/SignupForm";
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
 import AdminPage from "./Pages/AdminPage";
+import CompanyBusLines from "./Pages/CompanyBusLines";
 
 function App() {
   return (
@@ -20,9 +21,7 @@ function App() {
           path="/"
           element={
             <>
-              <Header title="BusCheck - Home" />
               <Home />
-              <Footer />
             </>
           }
         />
@@ -30,9 +29,7 @@ function App() {
           path="/Login"
           element={
             <>
-              <Header title="BusCheck - Login" />
               <LoginForm />
-              <Footer />
             </>
           }
         />
@@ -40,9 +37,7 @@ function App() {
           path="/SignUp"
           element={
             <>
-              <Header title="BusCheck - Sign Up" />
               <SignupForm />
-              <Footer />
             </>
           }
         />
@@ -50,9 +45,7 @@ function App() {
           path="/UiPassenger"
           element={
             <>
-              <Header title="BusCheck - Passenger" />
               <UiPassenger />
-              <Footer />
             </>
           }
         />
@@ -60,9 +53,7 @@ function App() {
           path="/UiDriver"
           element={
             <>
-              <Header title="BusCheck - Driver" />
               <UiDriver />
-              <Footer />
             </>
           }
         />
@@ -70,9 +61,7 @@ function App() {
           path="/UiDriver_FinalInfo"
           element={
             <>
-              <Header title="BusCheck - Driver Final Info" />
               <UiDriver_FinalInfo />
-              <Footer />
             </>
           }
         />
@@ -80,9 +69,7 @@ function App() {
           path="/BusInfo"
           element={
             <>
-              <Header title="BusCheck - Bus Info" />
               <BusInfo />
-              <Footer />
             </>
           }
         />
@@ -90,9 +77,7 @@ function App() {
           path="/BusStopInfo"
           element={
             <>
-              <Header title="BusCheck - Bus Stop Info" />
               <BusStopInfo />
-              <Footer />
             </>
           }
         />
@@ -100,11 +85,13 @@ function App() {
           path="/AdminPage"
           element={
             <>
-              <Header title="BusCheck - Admin" />
               <AdminPage />
-              <Footer />
             </>
           }
+        />
+        <Route
+          path="/company-bus-lines/:operatorRef"
+          element={<CompanyBusLines />}
         />
       </Routes>
     </BrowserRouter>

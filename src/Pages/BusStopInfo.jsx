@@ -174,7 +174,7 @@ const BusStopInfo = () => {
     setLines([]);
   };
 
-  return (
+  return ( 
     <>
       <Header title="חיפוש תחנות אוטובוס" />
       <main className="bus-stop-info-main">
