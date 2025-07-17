@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import '../Css/Header.css';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import "../Css/Header.css";
 
 const Header = ({ title }) => {
   const [opacity, setOpacity] = useState(1);
@@ -22,18 +22,21 @@ const Header = ({ title }) => {
       setLastScrollTop(currentScroll);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollTop]);
 
   return (
     <header className="modern-header" style={{ opacity }}>
       <div className="modern-header-container">
-        
         {/* Left side: Logo + title */}
         <div className="logo-title-group">
           <Link to="/" className="logo-link" aria-label="Home">
-            <img src="/finalProjImg2.png" alt="BusCheck Logo" className="logo-image" />
+            <img
+              src="/finalProjImg2.png"
+              alt="BusCheck Logo"
+              className="logo-image"
+            />
           </Link>
           <h1 className="site-title">{title}</h1>
         </div>
@@ -43,8 +46,15 @@ const Header = ({ title }) => {
 
         {/* Nav links */}
         <nav className="nav-links">
-          <Link to="/" className="nav-link">Home</Link>
-          <Link to="/ChooseSignInType" className="nav-link">Sign In</Link>
+          <Link to="/" className="nav-link">
+            Home
+          </Link>
+          <Link to="/Login" className="nav-link">
+            Login
+          </Link>
+          <Link to="/SignUp" className="nav-link">
+            Sign Up
+          </Link>
           <div className="transit-info-dropdown">
             <Link to="#" className="nav-link transit-info-link">
               Transit Info
@@ -59,7 +69,6 @@ const Header = ({ title }) => {
             </div>
           </div>
         </nav>
-
       </div>
     </header>
   );

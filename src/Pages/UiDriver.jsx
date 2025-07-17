@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import Header from '../Components/Header';
-import Footer from '../Components/Footer';
-import '../Css/UiDriver.css';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import Header from "../Components/Header";
+import Footer from "../Components/Footer";
+import "../Css/UiDriver.css";
+import { useNavigate } from "react-router-dom";
 
 const UiDriver = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({});
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setFormData({
@@ -18,13 +18,17 @@ const UiDriver = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.busCompany || !formData.busRouteNumber || !formData.depaetureTime) {
-      setError('Please fill in all fields');
+    if (
+      !formData.busCompany ||
+      !formData.busRouteNumber ||
+      !formData.depaetureTime
+    ) {
+      setError("Please fill in all fields");
       return;
     }
-    setError('');
-    console.log('Form submitted:', formData);
-    navigate('/UiDriver_FinalInfo');
+    setError("");
+    console.log("Form submitted:", formData);
+    navigate("/UiDriver_FinalInfo");
   };
 
   return (
@@ -32,6 +36,9 @@ const UiDriver = () => {
       <Header title="Transportation Planner" />
       <main className="ui-driver-main">
         <div className="ui-driver-container">
+          <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>
+            ברוך השב נהג
+          </h2>
           <h2>Transportation Planner</h2>
           <form onSubmit={handleSubmit}>
             <div className="ui-driver-inputgroup">
@@ -40,7 +47,7 @@ const UiDriver = () => {
                 type="text"
                 id="busCompany"
                 className="ui-driver-input"
-                value={formData.busCompany || ''}
+                value={formData.busCompany || ""}
                 onChange={handleChange}
                 placeholder="Enter pickup location"
                 required
@@ -51,7 +58,7 @@ const UiDriver = () => {
                 type="text"
                 id="busRouteNumber"
                 className="ui-driver-input"
-                value={formData.busRouteNumber || ''}
+                value={formData.busRouteNumber || ""}
                 onChange={handleChange}
                 placeholder="Enter the route number"
                 required
@@ -62,7 +69,7 @@ const UiDriver = () => {
                 type="text"
                 id="depaetureTime"
                 className="ui-driver-input"
-                value={formData.depaetureTime || ''}
+                value={formData.depaetureTime || ""}
                 onChange={handleChange}
                 placeholder="Enter the departure time"
                 required

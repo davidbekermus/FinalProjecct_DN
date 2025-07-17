@@ -5,30 +5,123 @@
   --accent-blue: #3b82f6;
 }
 
-/* Home.css */
-
+/* עיצוב ראשי לדף הבית */
 .home-main {
   background: linear-gradient(to bottom right, #add8e6, #ffffff);
   min-height: 100vh;
-  padding: 100px;
+  padding: 100px 40px;
   transition: background 0.5s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-
+/* מיכל התוכן */
 .home-content {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
-  /* other styles you may already have */
+  text-align: center;
+  direction: rtl;
 }
 
+/* כותרת ראשית */
 .home-heading {
-  font-size: 2.5rem;
-  color: #003366; /* a darker blue for contrast */
-  margin-bottom: 10px;
+  font-size: 3rem;
+  color: #003366;
+  margin-bottom: 20px;
+  font-weight: 700;
 }
 
+/* טקסט רגיל */
 .home-text {
-  font-size: 1.2rem;
-  color: #333;
-  line-height: 1.6;
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  line-height: 1.8;
+  margin-bottom: 30px;
+}
+
+/* כפתורים */
+.home-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 40px;
+}
+
+/* עיצוב כפתור */
+.home-button {
+  padding: 15px 30px;
+  border: none;
+  border-radius: 15px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 200px;
+  text-decoration: none;
+  display: inline-block;
+  direction: rtl;
+}
+
+/* כפתור ראשי */
+.home-button.primary {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.home-button.primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+}
+
+/* כפתור משני */
+.home-button.secondary {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+}
+
+.home-button.secondary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(40, 167, 69, 0.4);
+}
+
+/* עיצוב לתמונה */
+.home-content img {
+  max-width: 100%;
+  border-radius: 20px;
+  margin: 30px 0;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.home-content img:hover {
+  transform: scale(1.02);
+}
+
+/* רספונסיביות לנייד */
+@media (max-width: 768px) {
+  .home-main {
+    padding: 60px 20px;
+  }
+
+  .home-heading {
+    font-size: 2.2rem;
+  }
+
+  .home-text {
+    font-size: 1.05rem;
+  }
+
+  .home-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .home-button {
+    width: 100%;
+    max-width: 300px;
+  }
 }

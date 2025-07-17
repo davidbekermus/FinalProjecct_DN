@@ -8,14 +8,14 @@ const BusInfo = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [busData, setBusData] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState(null);
 
 
   const removeDuplicates = (data) => {
     const seen = new Set();
-    return data.filter(company => {
-      const key = company.agency_name?.toLowerCase() || '';
+    return data.filter((company) => {
+      const key = company.agency_name?.toLowerCase() || "";
       if (seen.has(key)) {
         return false;
       }
@@ -27,7 +27,9 @@ const BusInfo = () => {
   useEffect(() => {
     const fetchBusData = async () => {
       try {
-        const response = await fetch('https://open-bus-stride-api.hasadna.org.il/gtfs_agencies/list');
+        const response = await fetch(
+          "https://open-bus-stride-api.hasadna.org.il/gtfs_agencies/list"
+        );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -38,15 +40,12 @@ const BusInfo = () => {
           const uniqueData = removeDuplicates(data);
           setBusData(uniqueData);
         } else {
-          console.error('Unexpected data format:', data);
-          setError('Unexpected response format from API');
+          setError("Unexpected response format from API");
         }
       } catch (error) {
-        console.error('Error:', error);
-        setError(error.message || 'An error occurred while fetching bus data');
+        setError(error.message || "An error occurred while fetching bus data");
       }
     };
-
     fetchBusData();
   }, []);   
   
@@ -115,7 +114,6 @@ const BusInfo = () => {
               <p>Loading bus companies...</p>
             </div>
           ) : null}
-          {/* Search results will be displayed here */}
         </div>
       </main>
       <Footer />
