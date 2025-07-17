@@ -7,90 +7,171 @@ import '../Css/CompanyBusLines.css';
 const CompanyBusLines = () => {
   const { operatorRef } = useParams();
   const location = useLocation();
-  const [allBusLines, setAllBusLines] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
+  const itemsPerPage = 50;
+
+ 
+  const [busLines, setBusLines] = useState([]);
+  const [rawOffset, setRawOffset] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
-  const itemsPerPage = 30;
+  const [debouncedTerm, setDebouncedTerm] = useState('');
+  const [loadingPage, setLoadingPage] = useState(false);
+  const [error, setError] = useState(null);
+  const [totalBusLines, setTotalBusLines] = useState(0);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedTerm(searchTerm.trim());
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  
+  const resetData = () => {
+    setBusLines([]);
+    setRawOffset(0);
+    setCurrentPage(1);
+    setError(null);
+  };
 
   useEffect(() => {
     if (!operatorRef) {
       setError('No operator selected');
-      setLoading(false);
+      setLoadingPage(false);
       return;
     }
+    resetData();
+    setSearchTerm('');
+    setDebouncedTerm('');
+    fetchTotalBusLines();
 
-    const fetchBusLines = async () => {
-      try {
-        setLoading(true);
-        let fetchedLines = [];
-        let offset = 0;
-        const limit = 1000;
-        let hasMore = true;
+  }, [operatorRef]);
 
-        while (hasMore && offset < 60000) {
-          const response = await fetch(
-            `https://open-bus-stride-api.hasadna.org.il/gtfs_routes/list?limit=${limit}&offset=${offset}&order_by=id%20asc`
-          );
 
-          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+  useEffect(() => {
+    if (debouncedTerm.trim() === '') return;
+    resetData();
+    fetchUntilEnoughSearchResults(debouncedTerm, itemsPerPage);
+  }, [debouncedTerm]);
 
-          const batch = await response.json();
+  useEffect(() => {
+    const requiredCount = currentPage * itemsPerPage;
 
-          if (!Array.isArray(batch)) throw new Error('Unexpected response format from API');
 
-          const matches = batch.filter(line => {
-            const ref = line.operator_ref || line.gtfs_route__operator_ref;
-            return parseInt(ref) === parseInt(operatorRef);
-          });
+    if (busLines.length < requiredCount && !loadingPage) {
+      if (debouncedTerm) {
+        console.log(`Fetching search results for "${debouncedTerm}", page ${currentPage}`);
+        fetchUntilEnoughSearchResults(debouncedTerm, requiredCount);
+      } else {
+        console.log(`Fetching default bus lines page ${currentPage}`);
+        fetchUntilEnoughUnique(requiredCount);
+      }
+    }
+  }, [currentPage]);
 
-          fetchedLines = [...fetchedLines, ...matches];
-          offset += limit;
-          hasMore = batch.length === limit;
+ 
+  const fetchTotalBusLines = async () => {
+    try {
+      const response = await fetch(
+        `https://open-bus-stride-api.hasadna.org.il/gtfs_routes/list?get_count=true&operator_refs=${operatorRef}`
+      );
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const count = await response.json();
+      if (typeof count !== 'number') throw new Error('Unexpected count format');
+      setTotalBusLines(count);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to fetch total bus lines count');
+    }
+  };
 
-          await new Promise(res => setTimeout(res, 250));
-        }
+  
+  const fetchUntilEnoughUnique = async (neededCount) => {
+    setLoadingPage(true);
+    try {
+      let localBusLines = [];
+      let localSeenMkts = new Set();
+      let offset = 0;
 
-        const uniqueByRouteMkt = [];
-        const seenRouteMkts = new Set();
-        for (const line of fetchedLines) {
-          const routeMkt = line.route_mkt;
-          if (!seenRouteMkts.has(routeMkt)) {
-            seenRouteMkts.add(routeMkt);
-            uniqueByRouteMkt.push(line);
+      while (localBusLines.length < neededCount && offset < 60000) {
+        const res = await fetch(
+          `https://open-bus-stride-api.hasadna.org.il/gtfs_routes/list?limit=100&offset=${offset}&operator_refs=${operatorRef}&order_by=id%20asc`
+        );
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        const batch = await res.json();
+        if (!Array.isArray(batch)) throw new Error('Unexpected API format');
+
+        for (const line of batch) {
+          if (!localSeenMkts.has(line.route_mkt)) {
+            localSeenMkts.add(line.route_mkt);
+            localBusLines.push(line);
           }
         }
 
-        uniqueByRouteMkt.sort((a, b) => parseInt(a.route_short_name || 0) - parseInt(b.route_short_name || 0));
-        setAllBusLines(uniqueByRouteMkt);
-        setCurrentPage(1);
-        setLoading(false);
-      } catch (err) {
-        setError(err.message || 'Failed to fetch bus lines');
-        setLoading(false);
+        offset += 100;
+        if (batch.length < 100) break;
+        await new Promise((res) => setTimeout(res, 250));
       }
-    };
 
-    fetchBusLines();
-  }, [operatorRef]);
+      setBusLines(localBusLines);
+      setRawOffset(offset);
+    } catch (err) {
+      setError(err.message || 'Failed to fetch bus lines');
+    } finally {
+      setLoadingPage(false);
+    }
+  };
 
-  const filteredLines = useMemo(() => {
-    const term = searchTerm.toLowerCase();
-    return allBusLines.filter(line => {
-      return (
-        (line.route_short_name && line.route_short_name.toString().toLowerCase().includes(term)) ||
-        (line.route_long_name && line.route_long_name.toLowerCase().includes(term))
-      );
-    });
-  }, [searchTerm, allBusLines]);
+  const fetchUntilEnoughSearchResults = async (term, neededCount) => {
+    setLoadingPage(true);
+    try {
+      let localBusLines = [];
+      let localSeenMkts = new Set();
+      let offset = 0;
+
+      while (localBusLines.length < neededCount && offset < 60000) {
+        const response = await fetch(
+          `https://open-bus-stride-api.hasadna.org.il/gtfs_routes/list?limit=100&offset=${offset}&operator_refs=${operatorRef}&route_short_name=${term}`
+        );
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        const batch = await response.json();
+        if (!Array.isArray(batch)) throw new Error('Unexpected API format');
+
+        console.log(`Fetched ${batch.length} results from offset ${offset}, needed count: ${neededCount}, busLength: ${localBusLines.length}`);
+
+        for (const line of batch) {
+          if (!localSeenMkts.has(line.route_mkt)) {
+            localSeenMkts.add(line.route_mkt);
+            localBusLines.push(line);
+          }
+        }
+
+        offset += 100;
+        if (batch.length < 100) break;
+        await new Promise((res) => setTimeout(res, 250));
+      }
+
+      console.log(`Final total search results: ${localBusLines.length}`);
+      setBusLines(localBusLines);
+      setRawOffset(offset);
+    } catch (err) {
+      console.error('Error during search fetch:', err);
+      setError('Failed to fetch search results');
+    } finally {
+      setLoadingPage(false);
+    }
+  };
+
 
   const paginatedLines = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredLines.slice(startIndex, startIndex + itemsPerPage);
-  }, [currentPage, filteredLines]);
+    const start = (currentPage - 1) * itemsPerPage;
+    return busLines.slice(start, start + itemsPerPage);
+  }, [currentPage, busLines]);
 
-  const totalPages = Math.ceil(filteredLines.length / itemsPerPage);
+  
+  const totalPages = useMemo(() => Math.max(1, Math.ceil(busLines.length / itemsPerPage)), [busLines]);
 
   return (
     <div className="company-bus-lines-container">
@@ -98,25 +179,50 @@ const CompanyBusLines = () => {
       <main className="bus-lines-main">
         <div className="content-wrapper">
           <h2>Bus Lines</h2>
+          {totalBusLines > 0 && (
+            <p className="total-count-info">
+              Total bus lines: {totalBusLines} | {Math.ceil(totalBusLines / itemsPerPage)} pages
+            </p>
+          )}
 
-          <input
-            type="text"
-            placeholder="Search route name..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="bus-line-search-input"
-          />
+          <div className="search-container">
+            <input
+              type="text"
+              placeholder="Search by route_short_name..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                console.log('Search term typed:', e.target.value);
+              }}
+              className="bus-line-search-input"
+            />
+            {searchTerm && (
+              <button
+                className="clear-search-button"
+                onClick={() => {
+                  console.log('Search cleared');
+                  setSearchTerm('');
+                  setDebouncedTerm('');
+                }}
+              >
+                ✕
+              </button>
+            )}
+          </div>
 
-          {loading ? (
-            <div className="loading">Loading bus lines...</div>
-          ) : error ? (
+          {debouncedTerm && (
+            <div className="search-info">
+              Showing results for <strong>{debouncedTerm}</strong>
+            </div>
+          )}
+
+          {error ? (
             <div className="error-message">{error}</div>
           ) : (
             <div className="bus-lines-grid">
-              {paginatedLines.length > 0 ? (
+              {loadingPage && busLines.length === 0 ? (
+                <div className="skeleton-loader">Loading bus lines...</div>
+              ) : paginatedLines.length > 0 ? (
                 <>
                   <div className="grid-container">
                     {paginatedLines.map((line) => (
@@ -128,9 +234,10 @@ const CompanyBusLines = () => {
                       </div>
                     ))}
                   </div>
+
                   <div className="pagination-controls">
                     <button
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                       disabled={currentPage === 1}
                       className="pagination-button"
                     >
@@ -140,13 +247,15 @@ const CompanyBusLines = () => {
                       Page {currentPage} of {totalPages}
                     </span>
                     <button
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                      disabled={currentPage >= totalPages}
+                      onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                      disabled={currentPage === totalPages}
                       className="pagination-button"
                     >
                       Next
                     </button>
                   </div>
+
+                  {loadingPage && <div className="loading-spinner smaller" />}
                 </>
               ) : (
                 <p>No bus lines found</p>
