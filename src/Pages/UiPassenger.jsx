@@ -4,51 +4,57 @@ import Header from "../Components/Header";
 import Footer from "../Components/Footer";
 import "../Css/UiPassenger.css";
 
+const SEARCH_MODES = {
+  STATION: "station",
+  LOCATION: "location",
+  LINE: "line",
+};
+
 function UiPassenger() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({});
+  const [searchMode, setSearchMode] = useState(SEARCH_MODES.STATION);
+  const [stationName, setStationName] = useState("");
+  const [lineNumber, setLineNumber] = useState("");
   const [locationLoading, setLocationLoading] = useState(false);
   const [error, setError] = useState("");
+  const [results, setResults] = useState([]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+  // For location-based search
+  const [userLocation, setUserLocation] = useState(null);
+
+  const handleSearchMode = (mode) => {
+    setSearchMode(mode);
+    setError("");
+    setResults([]);
   };
 
-  const handleSubmit = (e) => {
+  const handleStationSearch = (e) => {
     e.preventDefault();
-    console.log("Form submitted:", form);
+    // TODO: fetch stations by name
+    setResults([`תוצאות חיפוש עבור תחנה: ${stationName}`]);
   };
 
-  const handleStationSearch = () => {
-    navigate("/BusStopInfo");
+  const handleLineSearch = (e) => {
+    e.preventDefault();
+    // TODO: fetch stations by line number
+    setResults([`תוצאות חיפוש עבור קו: ${lineNumber}`]);
   };
 
-  const handleUseMyLocation = () => {
+  const handleLocationSearch = () => {
     if (!navigator.geolocation) {
       setError("Geolocation is not supported by your browser.");
       return;
     }
     setLocationLoading(true);
     navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        try {
-          const response = await fetch(
-            `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=d4c5c4303dda4a4faacecc7b513d1ac9`
-          );
-          const data = await response.json();
-          if (data && data.results && data.results.length > 0) {
-            const formatted = data.results[0].formatted;
-            setForm((prev) => ({ ...prev, location: formatted }));
-            setError("");
-          } else {
-            setError("Could not find a readable address.");
-          }
-        } catch (err) {
-          setError("Failed to fetch address.");
-        }
+      (position) => {
+        setUserLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
         setLocationLoading(false);
+        // TODO: fetch 10 closest stations by coordinates
+        setResults(["10 תחנות הכי קרובות יוצגו כאן (דמו)"]);
       },
       () => {
         setError("Unable to retrieve your location.");
@@ -65,106 +71,141 @@ function UiPassenger() {
           <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>
             ברוך השב נוסע
           </h2>
-          <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "1rem",
+              justifyContent: "center",
+              marginBottom: "2rem",
+            }}
+          >
             <button
-              onClick={handleStationSearch}
+              onClick={() => handleSearchMode(SEARCH_MODES.STATION)}
               style={{
-                background: "linear-gradient(135deg, #667eea, #764ba2)",
-                color: "white",
+                background:
+                  searchMode === SEARCH_MODES.STATION ? "#7c3aed" : "#e0e7ff",
+                color: searchMode === SEARCH_MODES.STATION ? "#fff" : "#1e3a8a",
                 border: "none",
-                padding: "1rem 2rem",
-                borderRadius: "15px",
-                fontSize: "1.1rem",
-                fontWeight: "600",
+                borderRadius: "8px",
+                padding: "0.5rem 1.5rem",
+                fontWeight: 600,
                 cursor: "pointer",
-                transition: "all 0.3s ease",
-                marginBottom: "1rem",
-              }}
-              onMouseOver={(e) => {
-                e.target.style.transform = "translateY(-2px)";
-                e.target.style.boxShadow =
-                  "0 10px 20px rgba(102, 126, 234, 0.3)";
-              }}
-              onMouseOut={(e) => {
-                e.target.style.transform = "translateY(0)";
-                e.target.style.boxShadow = "none";
               }}
             >
-              🔍 חיפוש תחנות מתקדם
+              חיפוש לפי שם תחנה
+            </button>
+            <button
+              onClick={() => handleSearchMode(SEARCH_MODES.LOCATION)}
+              style={{
+                background:
+                  searchMode === SEARCH_MODES.LOCATION ? "#7c3aed" : "#e0e7ff",
+                color:
+                  searchMode === SEARCH_MODES.LOCATION ? "#fff" : "#1e3a8a",
+                border: "none",
+                borderRadius: "8px",
+                padding: "0.5rem 1.5rem",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              חיפוש לפי מיקום נוכחי
+            </button>
+            <button
+              onClick={() => handleSearchMode(SEARCH_MODES.LINE)}
+              style={{
+                background:
+                  searchMode === SEARCH_MODES.LINE ? "#7c3aed" : "#e0e7ff",
+                color: searchMode === SEARCH_MODES.LINE ? "#fff" : "#1e3a8a",
+                border: "none",
+                borderRadius: "8px",
+                padding: "0.5rem 1.5rem",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              חיפוש לפי מספר קו
             </button>
           </div>
-          <form onSubmit={handleSubmit}>
-            <div className="input-group">
-              <label>Where are you located?</label>
+
+          {/* Search by station name */}
+          {searchMode === SEARCH_MODES.STATION && (
+            <form
+              onSubmit={handleStationSearch}
+              style={{ marginBottom: "1.5rem" }}
+            >
+              <label>שם תחנה:</label>
               <input
                 type="text"
-                name="location"
-                value={form.location}
-                onChange={handleChange}
+                value={stationName}
+                onChange={(e) => setStationName(e.target.value)}
                 className="signin-input"
-                placeholder="Enter your location"
+                placeholder="הכנס שם תחנה"
                 required
+                style={{ marginBottom: "1rem" }}
               />
-              <button
-                type="button"
-                onClick={handleUseMyLocation}
-                disabled={locationLoading}
-                className="use-location-button"
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "#4f46e5",
-                  marginTop: "0.5rem",
-                  fontSize: "0.9rem",
-                  cursor: "pointer",
-                }}
-              >
-                {locationLoading ? "Detecting location…" : "Use My Location"}
+              <button type="submit" className="signin-button">
+                חפש
               </button>
-              {error && (
-                <p style={{ color: "red", fontSize: "0.9rem" }}>{error}</p>
+            </form>
+          )}
+
+          {/* Search by current location */}
+          {searchMode === SEARCH_MODES.LOCATION && (
+            <div style={{ marginBottom: "1.5rem", textAlign: "center" }}>
+              <button
+                onClick={handleLocationSearch}
+                className="signin-button"
+                disabled={locationLoading}
+              >
+                {locationLoading ? "מחפש מיקום..." : "מצא 10 תחנות קרובות"}
+              </button>
+              {userLocation && (
+                <div style={{ fontSize: "0.9rem", marginTop: "0.5rem" }}>
+                  מיקום נוכחי: {userLocation.lat.toFixed(5)},{" "}
+                  {userLocation.lng.toFixed(5)}
+                </div>
               )}
             </div>
-            <div className="input-group">
-              <label>Destination</label>
+          )}
+
+          {/* Search by line number */}
+          {searchMode === SEARCH_MODES.LINE && (
+            <form
+              onSubmit={handleLineSearch}
+              style={{ marginBottom: "1.5rem" }}
+            >
+              <label>מספר קו:</label>
               <input
                 type="text"
-                name="destination"
-                value={form.destination}
-                onChange={handleChange}
+                value={lineNumber}
+                onChange={(e) => setLineNumber(e.target.value)}
                 className="signin-input"
-                placeholder="Enter your destination"
+                placeholder="הכנס מספר קו"
                 required
+                style={{ marginBottom: "1rem" }}
               />
+              <button type="submit" className="signin-button">
+                חפש
+              </button>
+            </form>
+          )}
+
+          {/* Error message */}
+          {error && (
+            <p style={{ color: "red", textAlign: "center" }}>{error}</p>
+          )}
+
+          {/* Results */}
+          {results.length > 0 && (
+            <div style={{ marginTop: "2rem" }}>
+              <h3 style={{ textAlign: "center" }}>תוצאות חיפוש:</h3>
+              <ul>
+                {results.map((result, idx) => (
+                  <li key={idx}>{result}</li>
+                ))}
+              </ul>
             </div>
-            <div className="input-group">
-              <label>Transportation Company</label>
-              <input
-                type="text"
-                name="company"
-                value={form.company}
-                onChange={handleChange}
-                className="signin-input"
-                placeholder="e.g., MetroTransit, Amtrak"
-                required
-              />
-            </div>
-            <div className="input-group">
-              <label>Line to Board</label>
-              <input
-                type="text"
-                name="line"
-                value={form.line}
-                onChange={handleChange}
-                className="signin-input"
-                placeholder="e.g., Blue Line, Bus 24"
-                required
-              />
-            </div>
-            <button type="submit" className="signin-button">
-              Submit
-            </button>
-          </form>
+          )}
         </div>
       </main>
       <Footer />
