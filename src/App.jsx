@@ -12,6 +12,7 @@ import Header from "./Components/Header";
 import Footer from "./Components/Footer";
 import AdminPage from "./Pages/AdminPage";
 import CompanyBusLines from "./Pages/CompanyBusLines";
+import BusLineRoute from "./Pages/BusLineRoute";
 
 function App() {
   return (
@@ -92,6 +93,10 @@ function App() {
         <Route
           path="/company-bus-lines/:operatorRef"
           element={<CompanyBusLines />}
+        />
+        <Route
+          path="/bus-line-route/:gtfs_route_id"
+          element={<BusLineRoute />}
         />
       </Routes>
     </BrowserRouter>
