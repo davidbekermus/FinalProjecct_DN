@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import Header from '../Components/Header';
 import Footer from '../Components/Footer';
 import '../Css/CompanyBusLines.css';
@@ -7,171 +7,94 @@ import '../Css/CompanyBusLines.css';
 const CompanyBusLines = () => {
   const { operatorRef } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const itemsPerPage = 50;
 
  
-  const [busLines, setBusLines] = useState([]);
-  const [rawOffset, setRawOffset] = useState(0);
+  const [busLines, setBusLines] = useState([]); // Holds data for the CURRENT page only
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedTerm, setDebouncedTerm] = useState('');
-  const [loadingPage, setLoadingPage] = useState(false);
+  const [loadingPage, setLoadingPage] = useState(true);
   const [error, setError] = useState(null);
   const [totalBusLines, setTotalBusLines] = useState(0);
 
+  // Debounce search term
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedTerm(searchTerm.trim());
-    }, 500);
+    const handler = setTimeout(() => setDebouncedTerm(searchTerm), 500);
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  
-  const resetData = () => {
-    setBusLines([]);
-    setRawOffset(0);
+  // Reset page to 1 when a new search is performed
+  useEffect(() => {
     setCurrentPage(1);
-    setError(null);
-  };
+  }, [debouncedTerm]);
 
+  // --- Single Authoritative Hook for Data Fetching ---
   useEffect(() => {
     if (!operatorRef) {
       setError('No operator selected');
-      setLoadingPage(false);
       return;
     }
-    resetData();
-    setSearchTerm('');
-    setDebouncedTerm('');
-    fetchTotalBusLines();
 
-  }, [operatorRef]);
+    const fetchBusLines = async () => {
+      setLoadingPage(true);
+      setError(null);
 
+      const isSearching = debouncedTerm.trim() !== '';
+      const offset = (currentPage - 1) * itemsPerPage;
 
-  useEffect(() => {
-    if (debouncedTerm.trim() === '') return;
-    resetData();
-    fetchUntilEnoughSearchResults(debouncedTerm, itemsPerPage);
-  }, [debouncedTerm]);
+      // 1. Build the query for fetching data and for fetching the count
+      const baseQuery = `operator_refs=${operatorRef}`;
+      const searchQuery = isSearching ? `&route_short_name=${debouncedTerm}` : '';
+      const dataUrl = `http://localhost:3000/bus-lines?${baseQuery}${searchQuery}&limit=${itemsPerPage}&offset=${offset}`;
+      const countUrl = `http://localhost:3000/bus-lines?get_count=true&${baseQuery}${searchQuery}`;
 
-  useEffect(() => {
-    const requiredCount = currentPage * itemsPerPage;
+      try {
+        // 2. Fetch both the page data and the total count in parallel
+        const [dataRes, countRes] = await Promise.all([
+          fetch(dataUrl),
+          fetch(countUrl),
+        ]);
 
-
-    if (busLines.length < requiredCount && !loadingPage) {
-      if (debouncedTerm) {
-        console.log(`Fetching search results for "${debouncedTerm}", page ${currentPage}`);
-        fetchUntilEnoughSearchResults(debouncedTerm, requiredCount);
-      } else {
-        console.log(`Fetching default bus lines page ${currentPage}`);
-        fetchUntilEnoughUnique(requiredCount);
-      }
-    }
-  }, [currentPage]);
-
- 
-  const fetchTotalBusLines = async () => {
-    try {
-      const response = await fetch(
-        `https://open-bus-stride-api.hasadna.org.il/gtfs_routes/list?get_count=true&operator_refs=${operatorRef}`
-      );
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      const count = await response.json();
-      if (typeof count !== 'number') throw new Error('Unexpected count format');
-      setTotalBusLines(count);
-    } catch (err) {
-      console.error(err);
-      setError('Failed to fetch total bus lines count');
-    }
-  };
-
-  
-  const fetchUntilEnoughUnique = async (neededCount) => {
-    setLoadingPage(true);
-    try {
-      let localBusLines = [];
-      let localSeenMkts = new Set();
-      let offset = 0;
-
-      while (localBusLines.length < neededCount && offset < 60000) {
-        const res = await fetch(
-          `https://open-bus-stride-api.hasadna.org.il/gtfs_routes/list?limit=100&offset=${offset}&operator_refs=${operatorRef}&order_by=id%20asc`
-        );
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        const batch = await res.json();
-        if (!Array.isArray(batch)) throw new Error('Unexpected API format');
-
-        for (const line of batch) {
-          if (!localSeenMkts.has(line.route_mkt)) {
-            localSeenMkts.add(line.route_mkt);
-            localBusLines.push(line);
-          }
+        if (!dataRes.ok || !countRes.ok) {
+          throw new Error('Failed to fetch data from the server.');
         }
 
-        offset += 100;
-        if (batch.length < 100) break;
-        await new Promise((res) => setTimeout(res, 250));
+        const data = await dataRes.json();
+        const count = await countRes.json();
+
+        // 3. Update state with the new data
+        setBusLines(data);
+        setTotalBusLines(count);
+
+      } catch (err) {
+        setError(err.message);
+        setBusLines([]); // Clear data on error
+      } finally {
+        setLoadingPage(false);
       }
+    };
 
-      setBusLines(localBusLines);
-      setRawOffset(offset);
-    } catch (err) {
-      setError(err.message || 'Failed to fetch bus lines');
-    } finally {
-      setLoadingPage(false);
-    }
-  };
+    fetchBusLines();
 
-  const fetchUntilEnoughSearchResults = async (term, neededCount) => {
-    setLoadingPage(true);
+  }, [operatorRef, debouncedTerm, currentPage]); // Re-runs whenever the company, search, or page changes
+
+  const totalPages = useMemo(() => Math.max(1, Math.ceil(totalBusLines / itemsPerPage)), [totalBusLines]);
+
+  const getCityFromRoute = (routeLongName) => {
+    if (!routeLongName) return '';
     try {
-      let localBusLines = [];
-      let localSeenMkts = new Set();
-      let offset = 0;
-
-      while (localBusLines.length < neededCount && offset < 60000) {
-        const response = await fetch(
-          `https://open-bus-stride-api.hasadna.org.il/gtfs_routes/list?limit=100&offset=${offset}&operator_refs=${operatorRef}&route_short_name=${term}`
-        );
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-        const batch = await response.json();
-        if (!Array.isArray(batch)) throw new Error('Unexpected API format');
-
-        console.log(`Fetched ${batch.length} results from offset ${offset}, needed count: ${neededCount}, busLength: ${localBusLines.length}`);
-
-        for (const line of batch) {
-          if (!localSeenMkts.has(line.route_mkt)) {
-            localSeenMkts.add(line.route_mkt);
-            localBusLines.push(line);
-          }
-        }
-
-        offset += 100;
-        if (batch.length < 100) break;
-        await new Promise((res) => setTimeout(res, 250));
-      }
-
-      console.log(`Final total search results: ${localBusLines.length}`);
-      setBusLines(localBusLines);
-      setRawOffset(offset);
-    } catch (err) {
-      console.error('Error during search fetch:', err);
-      setError('Failed to fetch search results');
-    } finally {
-      setLoadingPage(false);
+      const originPart = routeLongName.split('<->')[0];
+      const cityParts = originPart.split('-');
+      // The city is the last part of the origin string before the <->
+      return cityParts[cityParts.length - 1];
+    } catch (e) {
+      console.error('Could not parse city from route name:', routeLongName);
+      return ''; // Return empty string on error
     }
   };
-
-
-  const paginatedLines = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return busLines.slice(start, start + itemsPerPage);
-  }, [currentPage, busLines]);
-
-  
-  const totalPages = useMemo(() => Math.max(1, Math.ceil(busLines.length / itemsPerPage)), [busLines]);
 
   return (
     <div className="company-bus-lines-container">
@@ -196,18 +119,7 @@ const CompanyBusLines = () => {
               }}
               className="bus-line-search-input"
             />
-            {searchTerm && (
-              <button
-                className="clear-search-button"
-                onClick={() => {
-                  console.log('Search cleared');
-                  setSearchTerm('');
-                  setDebouncedTerm('');
-                }}
-              >
-                ✕
-              </button>
-            )}
+
           </div>
 
           {debouncedTerm && (
@@ -220,17 +132,35 @@ const CompanyBusLines = () => {
             <div className="error-message">{error}</div>
           ) : (
             <div className="bus-lines-grid">
-              {loadingPage && busLines.length === 0 ? (
+              {loadingPage ? (
                 <div className="skeleton-loader">Loading bus lines...</div>
-              ) : paginatedLines.length > 0 ? (
+              ) : busLines.length > 0 ? (
                 <>
                   <div className="grid-container">
-                    {paginatedLines.map((line) => (
-                      <div key={line.id} className="bus-line-item">
+                    {busLines.map((line) => (
+                      <div
+                        key={line.id}
+                        className="bus-line-item"
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => {
+                          // Log the gtfs_route_id if needed
+                          // console.log(line.gtfs_route_id);
+                          navigate(`/bus-line-route/${line.id}`, {
+                            state: {
+                              routeShortName: line.route_short_name,
+                              routeLongName: line.route_long_name,
+                              agencyName: line.agency_name,
+                              id: line.id,
+                              operatorRef: operatorRef 
+                            } 
+                          });
+                        }}
+                      >
                         <h3>Route {line.route_short_name}</h3>
                         <p>Route Long Name: {line.route_long_name}</p>
                         <p>Type: {line.route_type}</p>
                         <p>Company: {line.agency_name}</p>
+                        <p>City: {getCityFromRoute(line.route_long_name)}</p>
                       </div>
                     ))}
                   </div>
