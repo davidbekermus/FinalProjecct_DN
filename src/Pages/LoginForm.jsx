@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "../Css/SignIn.css";
 import Footer from "../Components/Footer";
 import Header from "../Components/Header";
+import { signinValidation } from "../utils/validations";
 
 const LoginForm = () => {
   const nav = useNavigate();
@@ -21,6 +22,11 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const validationError = signinValidation(formData);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     try {
       setIsLoading(true);
       const { data } = await axios.post(

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "../Css/SignUp.css";
 import Footer from "../Components/Footer";
 import Header from "../Components/Header";
+import { signupValidation } from "../utils/validations";
 
 const SignupForm = () => {
   const nav = useNavigate();
@@ -11,7 +12,7 @@ const SignupForm = () => {
     name: "",
     email: "",
     password: "",
-    role: "traveler",
+    role: "",
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -23,6 +24,11 @@ const SignupForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const validationError = signupValidation(formData);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     try {
       setIsLoading(true);
       await axios.post("http://localhost:3000/auth/signup", formData);
@@ -90,11 +96,10 @@ const SignupForm = () => {
                 value={formData.role}
                 onChange={handleChange}
                 className="signup-input"
-                b
                 required
               >
+                <option value="passenger">Passenger</option>
                 <option value="driver">Driver</option>
-                <option value="traveler">Traveler</option>
               </select>
             </div>
             <button
