@@ -1,17 +1,27 @@
 export const signupValidation = (formData) => {
-  if (!formData.name || !formData.email || !formData.password) {
+  if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
     return "Please fill in all fields";
-  } else if (formData.password.length < 8) {
-    return "Password must be at least 8 characters long";
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+  }
+  if (formData.name.length < 2 || formData.name.length > 50) {
+    return "Name must be between 2 and 50 characters.";
+  }
+  if (!/.+@.+\..+/.test(formData.email)) {
     return "Please enter a valid email address";
-  } else if (
-    !/\d/.test(formData.password) ||
-    !/[A-Z]/.test(formData.password) ||
-    !/[a-z]/.test(formData.password) ||
-    !/[!@#$%^&*]/.test(formData.password)
-  ) {
-    return "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character";
+  }
+  if (formData.password.length < 6 || formData.password.length > 128) {
+    return "Password must be between 6 and 128 characters.";
+  }
+  if (!/[0-9]/.test(formData.password)) {
+    return "Password must contain at least one number.";
+  }
+  if (!/[^A-Za-z0-9]/.test(formData.password)) {
+    return "Password must contain at least one symbol.";
+  }
+  if (formData.password !== formData.confirmPassword) {
+    return "Passwords do not match.";
+  }
+  if (!formData.role || (formData.role !== "passenger" && formData.role !== "driver")) {
+    return "Please select a valid user type.";
   }
   return "";
 };
@@ -19,13 +29,7 @@ export const signupValidation = (formData) => {
 export const signinValidation = (formData) => {
   if (!formData.email || !formData.password) {
     return "Please fill in all fields.";
-  } else if (
-    !/\d/.test(formData.password) ||
-    !/[A-Z]/.test(formData.password) ||
-    !/[a-z]/.test(formData.password) ||
-    !/[!@#$%^&*]/.test(formData.password)
-  ) {
-    return "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character";
   }
+  // You may want to add similar password checks here if needed
   return "";
 };
