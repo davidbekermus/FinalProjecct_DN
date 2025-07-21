@@ -12,14 +12,20 @@ const SignupForm = () => {
     name: "",
     email: "",
     password: "",
-    role: "",
+    confirmPassword: "",
+    role: "passenger",
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // 👈 New state for visibility
 
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
   };
 
   const handleSubmit = async (e) => {
@@ -81,7 +87,7 @@ const SignupForm = () => {
               <label htmlFor="password">Password:</label>
               <input
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={formData.password}
                 onChange={handleChange}
                 required
@@ -89,6 +95,30 @@ const SignupForm = () => {
                 placeholder="Enter your password"
               />
             </div>
+            <div className="signup-group">
+              <label htmlFor="confirmPassword">Confirm Password:</label>
+              <input
+                id="confirmPassword"
+                type={showPassword ? "text" : "password"}
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+                className="signup-input"
+                placeholder="Re-enter your password"
+              />
+            </div>
+
+            <div className="signup-group">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={showPassword}
+                  onChange={togglePasswordVisibility}
+                />{" "}
+                Show Password
+              </label>
+            </div>
+
             <div className="signup-group">
               <label htmlFor="role">User Type:</label>
               <select
@@ -115,7 +145,7 @@ const SignupForm = () => {
           </form>
         </div>
       </div>
-      <Footer />{" "}
+      <Footer />
     </div>
   );
 };
