@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
 import "../Css/UiPassenger.css";
+import { api } from "../utils/api";
 
 const SEARCH_MODES = {
   STATION: "station",
@@ -28,15 +29,19 @@ function UiPassenger() {
     setResults([]);
   };
 
-  const handleStationSearch = (e) => {
+  const handleStationSearch = async (e) => {
     e.preventDefault();
-    // TODO: fetch stations by name
+    // Example: Replace this with a real API call
+    // const response = await api.get(`/stations/search?name=${stationName}`);
+    // setResults(response.data);
     setResults([`תוצאות חיפוש עבור תחנה: ${stationName}`]);
   };
 
-  const handleLineSearch = (e) => {
+  const handleLineSearch = async (e) => {
     e.preventDefault();
-    // TODO: fetch stations by line number
+    // Example: Replace this with a real API call
+    // const response = await api.get(`/stations/search?line=${lineNumber}`);
+    // setResults(response.data);
     setResults([`תוצאות חיפוש עבור קו: ${lineNumber}`]);
   };
 
@@ -53,7 +58,10 @@ function UiPassenger() {
           lng: position.coords.longitude,
         });
         setLocationLoading(false);
-        // TODO: fetch 10 closest stations by coordinates
+        // Example: Replace this with a real API call
+        // api.get(`/stations/nearby?lat=${position.coords.latitude}&lng=${position.coords.longitude}`)
+        //   .then(res => setResults(res.data))
+        //   .catch(() => setError("Failed to fetch nearby stations"));
         setResults(["10 תחנות הכי קרובות יוצגו כאן (דמו)"]);
       },
       () => {

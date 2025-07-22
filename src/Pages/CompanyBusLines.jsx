@@ -3,6 +3,7 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import Header from '../Components/Header';
 import Footer from '../Components/Footer';
 import '../Css/CompanyBusLines.css';
+import { api } from '../utils/api';
 
 const CompanyBusLines = () => {
   const { operatorRef } = useParams();
@@ -48,22 +49,18 @@ const CompanyBusLines = () => {
       // 1. Build the query for fetching data and for fetching the count
       const baseQuery = `operator_refs=${operatorRef}`;
       const searchQuery = isSearching ? `&route_short_name=${debouncedTerm}` : '';
-      const dataUrl = `http://localhost:3000/bus-lines?${baseQuery}${searchQuery}&limit=${itemsPerPage}&offset=${offset}`;
-      const countUrl = `http://localhost:3000/bus-lines?get_count=true&${baseQuery}${searchQuery}`;
+      const dataUrl = `/bus-lines?${baseQuery}${searchQuery}&limit=${itemsPerPage}&offset=${offset}`;
+      const countUrl = `/bus-lines?get_count=true&${baseQuery}${searchQuery}`;
 
       try {
         // 2. Fetch both the page data and the total count in parallel
         const [dataRes, countRes] = await Promise.all([
-          fetch(dataUrl),
-          fetch(countUrl),
+          api.get(dataUrl),
+          api.get(countUrl),
         ]);
 
-        if (!dataRes.ok || !countRes.ok) {
-          throw new Error('Failed to fetch data from the server.');
-        }
-
-        const data = await dataRes.json();
-        const count = await countRes.json();
+        const data = dataRes.data;
+        const count = countRes.data;
 
         // 3. Update state with the new data
         setBusLines(data);

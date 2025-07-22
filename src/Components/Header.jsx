@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "../Css/Header.css";
+import { AuthContext } from "../App";
 
 const Header = ({ title }) => {
   const [opacity, setOpacity] = useState(1);
   const [lastScrollTop, setLastScrollTop] = useState(0);
+  const { user, setUser, setToken } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,6 +28,13 @@ const Header = ({ title }) => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollTop]);
+
+  const handleSignOut = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+    setToken(null);
+    navigate("/");
+  };
 
   return (
     <header className="modern-header" style={{ opacity }}>
@@ -49,12 +59,25 @@ const Header = ({ title }) => {
           <Link to="/" className="nav-link">
             Home
           </Link>
-          <Link to="/Login" className="nav-link">
-            Login
-          </Link>
-          <Link to="/SignUp" className="nav-link">
-            Sign Up
-          </Link>
+          {user ? (
+            <>
+              <span className="nav-link" style={{ cursor: "default", fontWeight: 600 }}>
+                Hello {user.name}
+              </span>
+              <button className="nav-link" onClick={handleSignOut} style={{ background: "none", border: "none", cursor: "pointer" }}>
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/Login" className="nav-link">
+                Login
+              </Link>
+              <Link to="/SignUp" className="nav-link">
+                Sign Up
+              </Link>
+            </>
+          )}
           <div className="transit-info-dropdown">
             <Link to="#" className="nav-link transit-info-link">
               Transit Info

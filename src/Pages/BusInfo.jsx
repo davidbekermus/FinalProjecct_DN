@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../Components/Header';
 import Footer from '../Components/Footer';
 import '../Css/BusInfo.css';
+import { api } from '../utils/api';
 
 const BusInfo = () => {
   const navigate = useNavigate();
@@ -10,7 +11,6 @@ const BusInfo = () => {
   const [busData, setBusData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState(null);
-
 
   const removeDuplicates = (data) => {
     const seen = new Set();
@@ -27,13 +27,10 @@ const BusInfo = () => {
   useEffect(() => {
     const fetchBusData = async () => {
       try {
-        const response = await fetch(
-          "https://open-bus-stride-api.hasadna.org.il/gtfs_agencies/list"
+        const response = await api.get(
+          "/gtfs_agencies/list"
         );
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
+        const data = response.data;
         console.log('API Response:', data);
         
         if (Array.isArray(data)) {
