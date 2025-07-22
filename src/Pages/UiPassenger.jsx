@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
@@ -18,6 +18,8 @@ function UiPassenger() {
   const [locationLoading, setLocationLoading] = useState(false);
   const [error, setError] = useState("");
   const [results, setResults] = useState([]);
+  const [stations, setStations] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // For location-based search
   const [userLocation, setUserLocation] = useState(null);
@@ -28,10 +30,37 @@ function UiPassenger() {
     setResults([]);
   };
 
-  const handleStationSearch = (e) => {
+  const handleStationSearch = async (e) => {
     e.preventDefault();
-    // TODO: fetch stations by name
-    setResults([`תוצאות חיפוש עבור תחנה: ${stationName}`]);
+    setError("");
+    setResults([]);
+    setLoading(true);
+
+    try {
+      const res = await fetch(
+        "https://open-bus-stride-api.hasadna.org.il/gtfs_stops/list?limit=1000"
+      );
+      const data = await res.json();
+      const allStations = data.map((stop) => ({
+        id: stop.id,
+        name: stop.name,
+        city: stop.city,
+        lat: stop.lat,
+        lon: stop.lon,
+        code: stop.code,
+      }));
+      
+      const filtered = allStations.filter(
+        (s) =>
+          s.city?.toLowerCase().includes(stationName.toLowerCase()) ||
+          s.name?.toLowerCase().includes(stationName.toLowerCase())
+      );
+      
+      setResults(filtered.slice(0, 20)); // הגבלה ל-20 תוצאות
+    } catch (err) {
+      setError("שגיאה בחיפוש תחנות");
+    }
+    setLoading(false);
   };
 
   const handleLineSearch = (e) => {
@@ -40,27 +69,79 @@ function UiPassenger() {
     setResults([`תוצאות חיפוש עבור קו: ${lineNumber}`]);
   };
 
-  const handleLocationSearch = () => {
+  const handleLocationSearch = async () => {
     if (!navigator.geolocation) {
-      setError("Geolocation is not supported by your browser.");
+      setError("הדפדפן לא תומך במיקום");
       return;
     }
     setLocationLoading(true);
+    setLoading(true);
+    
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setUserLocation({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
+      async (position) => {
+        try {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+          
+          const res = await fetch(
+            "https://open-bus-stride-api.hasadna.org.il/gtfs_stops/list?limit=1000"
+          );
+          const data = await res.json();
+          const allStations = data.map((stop) => ({
+            id: stop.id,
+            name: stop.name,
+            city: stop.city,
+            lat: stop.lat,
+            lon: stop.lon,
+            code: stop.code,
+          }));
+          
+          // חישוב מרחק
+          const calcDist = (lat1, lon1, lat2, lon2) => {
+            const R = 6371;
+            const dLat = ((lat2 - lat1) * Math.PI) / 180;
+            const dLon = ((lon2 - lon1) * Math.PI) / 180;
+            const a =
+              Math.sin(dLat / 2) ** 2 +
+              Math.cos((lat1 * Math.PI) / 180) *
+                Math.cos((lat2 * Math.PI) / 180) *
+                Math.sin(dLon / 2) ** 2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+          };
+          
+          const sorted = allStations
+            .map((s) => ({
+              ...s,
+              distance: calcDist(position.coords.latitude, position.coords.longitude, s.lat, s.lon),
+            }))
+            .filter((s) => s.distance <= 3) // סינון תחנות עד 3 ק"מ בלבד
+            .sort((a, b) => a.distance - b.distance);
+            
+          setResults(sorted);
+        } catch (err) {
+          setError("שגיאה בחיפוש תחנות");
+        }
         setLocationLoading(false);
-        // TODO: fetch 10 closest stations by coordinates
-        setResults(["10 תחנות הכי קרובות יוצגו כאן (דמו)"]);
+        setLoading(false);
       },
       () => {
-        setError("Unable to retrieve your location.");
+        setError("שגיאה בקבלת מיקום");
         setLocationLoading(false);
+        setLoading(false);
       }
     );
+  };
+
+  const handleStationClick = (station) => {
+    // ניווט לעמוד הקווים עם נתוני התחנה
+    console.log("Station clicked in UiPassenger:", station);
+    console.log("Station ID:", station.id, "Type:", typeof station.id);
+    
+    navigate('/station-lines', {
+      state: { station }
+    });
   };
 
   return (
@@ -157,7 +238,7 @@ function UiPassenger() {
                 className="signin-button"
                 disabled={locationLoading}
               >
-                {locationLoading ? "מחפש מיקום..." : "מצא 10 תחנות קרובות"}
+                {locationLoading ? "מחפש מיקום..." : "מצא תחנות קרובות"}
               </button>
               {userLocation && (
                 <div style={{ fontSize: "0.9rem", marginTop: "0.5rem" }}>
@@ -190,20 +271,73 @@ function UiPassenger() {
             </form>
           )}
 
+          {/* Loading message */}
+          {loading && (
+            <div style={{ textAlign: "center", padding: "1rem", color: "#6b7280" }}>
+              טוען תחנות...
+            </div>
+          )}
+
           {/* Error message */}
           {error && (
             <p style={{ color: "red", textAlign: "center" }}>{error}</p>
           )}
 
           {/* Results */}
-          {results.length > 0 && (
+          {!loading && results.length > 0 && (
             <div style={{ marginTop: "2rem" }}>
-              <h3 style={{ textAlign: "center" }}>תוצאות חיפוש:</h3>
-              <ul>
-                {results.map((result, idx) => (
-                  <li key={idx}>{result}</li>
+              <h3 style={{ textAlign: "center", marginBottom: "1rem" }}>תוצאות חיפוש ({results.length}):</h3>
+              <div style={{ display: "grid", gap: "1rem" }}>
+                {results.map((station, idx) => (
+                  <div
+                    key={station.id || idx}
+                    onClick={() => handleStationClick(station)}
+                    style={{
+                      background: "white",
+                      border: "2px solid #e5e7eb",
+                      borderRadius: "12px",
+                      padding: "1rem",
+                      cursor: "pointer",
+                      transition: "all 0.3s ease",
+                      display: "flex",
+                      alignItems: "center",
+                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.borderColor = "#667eea";
+                      e.target.style.transform = "translateY(-2px)";
+                      e.target.style.boxShadow = "0 8px 24px rgba(102, 126, 234, 0.15)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.borderColor = "#e5e7eb";
+                      e.target.style.transform = "translateY(0)";
+                      e.target.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.05)";
+                    }}
+                  >
+                    <div style={{ fontSize: "2rem", marginLeft: "1rem" }}>🚌</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: "600", fontSize: "1rem", color: "#1f2937", marginBottom: "0.25rem" }}>
+                        {station.name}
+                      </div>
+                      <div style={{ fontSize: "0.9rem", color: "#6b7280" }}>
+                        {station.city}
+                      </div>
+                      {station.distance && (
+                        <div style={{ fontSize: "0.8rem", color: "#9ca3af", marginTop: "0.25rem" }}>
+                          מרחק: {station.distance.toFixed(1)} ק"מ
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ fontSize: "1.5rem", color: "#9ca3af", marginRight: "0.5rem" }}>→</div>
+                  </div>
                 ))}
-              </ul>
+              </div>
+            </div>
+          )}
+
+          {!loading && !error && results.length === 0 && searchMode !== SEARCH_MODES.LINE && (
+            <div style={{ textAlign: "center", padding: "2rem", color: "#6b7280" }}>
+              לא נמצאו תחנות. נסה חיפוש אחר.
             </div>
           )}
         </div>

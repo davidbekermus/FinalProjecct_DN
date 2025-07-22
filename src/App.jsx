@@ -13,6 +13,7 @@ import Footer from "./Components/Footer";
 import AdminPage from "./Pages/AdminPage";
 import CompanyBusLines from "./Pages/CompanyBusLines";
 import BusLineRoute from "./Pages/BusLineRoute";
+import StationLines from "./Pages/StationLines";
 
 function App() {
   return (
@@ -97,6 +98,10 @@ function App() {
         <Route
           path="/bus-line-route/:gtfs_route_id"
           element={<BusLineRoute />}
+        />
+        <Route
+          path="/station-lines"
+          element={<StationLines />}
         />
       </Routes>
     </BrowserRouter>
