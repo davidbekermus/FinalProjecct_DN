@@ -5,9 +5,13 @@ import "../Css/SignIn.css";
 import Footer from "../Components/Footer";
 import Header from "../Components/Header";
 import { signinValidation } from "../utils/validations";
+import { AuthContext } from "../App";
+import { useContext } from "react";
 
 const LoginForm = () => {
+  console.log("LoginForm rendered");
   const nav = useNavigate();
+  const { setUser, setToken } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -22,8 +26,10 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("handleSubmit called");
     const validationError = signinValidation(formData);
     if (validationError) {
+      console.log("Validation error:", validationError);
       setError(validationError);
       return;
     }
@@ -33,21 +39,36 @@ const LoginForm = () => {
         "http://localhost:3000/auth/login",
         formData
       );
-      setError("");
+      console.log("Login response data:", data);
+      if (!data?.token || !data?.user) {
+        throw new Error("Malformed response");
+      }
+
       localStorage.setItem("token", data.token);
+      setUser(data.user);
+      if (typeof setToken === "function") setToken(data.token);
+
+      console.log("User role:", data.user.role);
       if (data.user.role === "admin") {
+        console.log("Navigating to /AdminPage");
         nav("/AdminPage");
       } else if (data.user.role === "driver") {
+        console.log("Navigating to /UiDriver");
         nav("/UiDriver");
       } else {
+        console.log("Navigating to /UiPassenger");
         nav("/UiPassenger");
       }
+      setError("");
+
     } catch (err) {
       if (err.response?.status === 401) {
         setError("Invalid email or password");
         return;
-      }
+      }else {
+        console.log("Error:", err);
       setError(err.response?.data?.message || "Something went wrong");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -88,6 +109,7 @@ const LoginForm = () => {
               type="submit"
               className="signin-button"
               disabled={isLoading}
+              onClick={() => console.log("Button clicked")}
             >
               {isLoading ? "Loading..." : "Login"}
             </button>

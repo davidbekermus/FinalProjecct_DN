@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
 import "../Css/UiPassenger.css";
+import { api } from "../utils/api";
 
 const SEARCH_MODES = {
   STATION: "station",
@@ -32,40 +33,15 @@ function UiPassenger() {
 
   const handleStationSearch = async (e) => {
     e.preventDefault();
-    setError("");
-    setResults([]);
-    setLoading(true);
-
-    try {
-      const res = await fetch(
-        "https://open-bus-stride-api.hasadna.org.il/gtfs_stops/list?limit=1000"
-      );
-      const data = await res.json();
-      const allStations = data.map((stop) => ({
-        id: stop.id,
-        name: stop.name,
-        city: stop.city,
-        lat: stop.lat,
-        lon: stop.lon,
-        code: stop.code,
-      }));
-      
-      const filtered = allStations.filter(
-        (s) =>
-          s.city?.toLowerCase().includes(stationName.toLowerCase()) ||
-          s.name?.toLowerCase().includes(stationName.toLowerCase())
-      );
-      
-      setResults(filtered.slice(0, 20)); // הגבלה ל-20 תוצאות
-    } catch (err) {
-      setError("שגיאה בחיפוש תחנות");
-    }
-    setLoading(false);
+    // TODO: fetch stations by name
+    setResults([`תוצאות חיפוש עבור תחנה: ${stationName}`]);
   };
 
-  const handleLineSearch = (e) => {
+  const handleLineSearch = async (e) => {
     e.preventDefault();
-    // TODO: fetch stations by line number
+    // Example: Replace this with a real API call
+    // const response = await api.get(`/stations/search?line=${lineNumber}`);
+    // setResults(response.data);
     setResults([`תוצאות חיפוש עבור קו: ${lineNumber}`]);
   };
 
@@ -124,7 +100,8 @@ function UiPassenger() {
           setError("שגיאה בחיפוש תחנות");
         }
         setLocationLoading(false);
-        setLoading(false);
+        // TODO: fetch 10 closest stations by coordinates
+        setResults(["10 תחנות הכי קרובות יוצגו כאן (דמו)"]);
       },
       () => {
         setError("שגיאה בקבלת מיקום");

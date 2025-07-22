@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
 import "../Css/BusStopInfo.css";
+import { api } from "../utils/api";
 
 const LocationIcon = () => (
   <svg
@@ -39,10 +40,10 @@ const BusStopInfo = () => {
     const fetchStations = async () => {
       setLoading(true);
       try {
-        const res = await fetch(
-          "https://open-bus-stride-api.hasadna.org.il/gtfs_stops/list?limit=1000"
+        const res = await api.get(
+          "/gtfs_stops/list?limit=1000"
         );
-        const data = await res.json();
+        const data = res.data;
         setStations(
           data.map((stop) => ({
             id: stop.id,
@@ -127,10 +128,10 @@ const BusStopInfo = () => {
 
     try {
       // שליפת ה-ride stops לפי stop_id (id של התחנה)
-      const resRideStops = await fetch(
-        `https://open-bus-stride-api.hasadna.org.il/gtfs_ride_stops/list?stop_id=${station.id}&get_count=false&order_by=id%20asc`
+      const resRideStops = await api.get(
+        `/gtfs_ride_stops/list?stop_id=${station.id}&get_count=false&order_by=id%20asc`
       );
-      const rideStopsData = await resRideStops.json();
+      const rideStopsData = resRideStops.data;
 
       if (!rideStopsData || rideStopsData.length === 0) {
         setLines(["לא נמצאו קווים לתחנה זו"]);
@@ -143,10 +144,10 @@ const BusStopInfo = () => {
 
       // שליפת פרטי הקווים לפי ה-route_id
       const queryParams = uniqueRouteIds.map(id => `route_id=${id}`).join("&");
-      const resRoutes = await fetch(
-        `https://open-bus-stride-api.hasadna.org.il/gtfs_routes/list?${queryParams}`
+      const resRoutes = await api.get(
+        `/gtfs_routes/list?${queryParams}`
       );
-      const routesData = await resRoutes.json();
+      const routesData = resRoutes.data;
 
       if (!routesData || routesData.length === 0) {
         // אם אין מידע מפורט, נראה רק את המספרים

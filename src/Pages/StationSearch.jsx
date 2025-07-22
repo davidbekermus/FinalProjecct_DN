@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
 import "../Css/StationSearch.css";
+import { api } from "../utils/api";
 
 function StationSearch() {
   const navigate = useNavigate();
@@ -81,11 +82,10 @@ function StationSearch() {
         const { latitude, longitude } = position.coords;
 
         try {
-          const response = await fetch(
+          const response = await api.get(
             `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=d4c5c4303dda4a4faacecc7b513d1ac9`
           );
-
-          const data = await response.json();
+          const data = response.data;
 
           if (data && data.results && data.results.length > 0) {
             const formatted = data.results[0].formatted;
