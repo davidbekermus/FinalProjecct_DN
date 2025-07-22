@@ -14,6 +14,7 @@ import Footer from "./Components/Footer";
 import AdminPage from "./Pages/AdminPage";
 import CompanyBusLines from "./Pages/CompanyBusLines";
 import BusLineRoute from "./Pages/BusLineRoute";
+import StationLines from "./Pages/StationLines";
 import axios from "axios";
 
 const routes = [
