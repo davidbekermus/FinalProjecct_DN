@@ -3,6 +3,7 @@ import { useParams, useLocation } from 'react-router-dom';
 import Header from '../Components/Header';
 import Footer from '../Components/Footer';
 import '../Css/BusLineRoute.css';
+import { api } from '../utils/api';
 
 const BusLineRoute = () => {
   const { gtfs_route_id } = useParams();
@@ -24,11 +25,10 @@ const BusLineRoute = () => {
         console.log(gtfs_route_id || 'no gtfs_route_id');
 
         // 1. Fetch the first journey for the route
-        const journeyRes = await fetch(
-          `https://open-bus-stride-api.hasadna.org.il/gtfs_rides/list?get_count=false&gtfs_route_id=${gtfs_route_id}&order_by=id%20asc`
+        const journeyRes = await api.get(
+          `/gtfs_rides/list?get_count=false&gtfs_route_id=${gtfs_route_id}&order_by=id%20asc`
         );
-        if (!journeyRes.ok) throw new Error('Failed to fetch journey', console.log(gtfs_route_id));
-        const journeys = await journeyRes.json();
+        const journeys = journeyRes.data;
         if (!Array.isArray(journeys) || journeys.length === 0) {
           setError('No journeys found for this route.');
           setLoading(false);
@@ -37,11 +37,10 @@ const BusLineRoute = () => {
         const firstJourneyId = journeys[0].id;
         setJourneyId(firstJourneyId);
         // 2. Fetch the stops for the first journey
-        const stopsRes = await fetch(
-          `https://open-bus-stride-api.hasadna.org.il/gtfs_ride_stops/list?get_count=false&gtfs_ride_ids=${firstJourneyId}&order_by=id%20asc`
+        const stopsRes = await api.get(
+          `/gtfs_ride_stops/list?get_count=false&gtfs_ride_ids=${firstJourneyId}&order_by=id%20asc`
         );
-        if (!stopsRes.ok) throw new Error('Failed to fetch stops');
-        const stopsData = await stopsRes.json();
+        const stopsData = stopsRes.data;
         setStops(stopsData);
       } catch (err) {
         console.log(gtfs_route_id);
