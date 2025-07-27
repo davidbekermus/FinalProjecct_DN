@@ -34,25 +34,37 @@ function UiPassenger() {
   const handleStationSearch = async (e) => {
     e.preventDefault();
     // TODO: fetch stations by name
-    setResults([`תוצאות חיפוש עבור תחנה: ${stationName}`]);
+    setResults([`Search results for station: ${stationName}`]);
   };
 
   const handleLineSearch = async (e) => {
     e.preventDefault();
-    // Example: Replace this with a real API call
-    // const response = await api.get(`/stations/search?line=${lineNumber}`);
-    // setResults(response.data);
-    setResults([`תוצאות חיפוש עבור קו: ${lineNumber}`]);
+    setLoading(true);
+    setError("");
+    setResults([]);
+    try {
+      const response = await api.get(`/bus-lines?get_count=false&route_short_name=${encodeURIComponent(lineNumber)}`);
+      const data = response.data;
+      if (Array.isArray(data) && data.length > 0) {
+        setResults(data);
+      } else {
+        setResults([]);
+        setError("No lines found matching the entered number.");
+      }
+    } catch (err) {
+      setError("Error searching for lines: " + (err.response?.data?.message || err.message));
+      setResults([]);
+    }
+    setLoading(false);
   };
 
   const handleLocationSearch = async () => {
     if (!navigator.geolocation) {
-      setError("הדפדפן לא תומך במיקום");
+      setError("Your browser does not support location services");
       return;
     }
     setLocationLoading(true);
     setLoading(true);
-    
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         try {
@@ -60,7 +72,6 @@ function UiPassenger() {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           });
-          
           const res = await fetch(
             "https://open-bus-stride-api.hasadna.org.il/gtfs_stops/list?limit=1000"
           );
@@ -73,7 +84,6 @@ function UiPassenger() {
             lon: stop.lon,
             code: stop.code,
           }));
-          
           // חישוב מרחק
           const calcDist = (lat1, lon1, lat2, lon2) => {
             const R = 6371;
@@ -86,25 +96,22 @@ function UiPassenger() {
                 Math.sin(dLon / 2) ** 2;
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
           };
-          
           const sorted = allStations
             .map((s) => ({
               ...s,
               distance: calcDist(position.coords.latitude, position.coords.longitude, s.lat, s.lon),
             }))
-            .filter((s) => s.distance <= 3) // סינון תחנות עד 3 ק"מ בלבד
+            .filter((s) => s.distance <= 3)
             .sort((a, b) => a.distance - b.distance);
-            
           setResults(sorted);
         } catch (err) {
-          setError("שגיאה בחיפוש תחנות");
+          setError("Error searching for stations");
         }
         setLocationLoading(false);
-        // TODO: fetch 10 closest stations by coordinates
-        setResults(["10 תחנות הכי קרובות יוצגו כאן (דמו)"]);
+        setLoading(false);
       },
       () => {
-        setError("שגיאה בקבלת מיקום");
+        setError("Error getting location");
         setLocationLoading(false);
         setLoading(false);
       }
@@ -112,13 +119,21 @@ function UiPassenger() {
   };
 
   const handleStationClick = (station) => {
-    // ניווט לעמוד הקווים עם נתוני התחנה
-    console.log("Station clicked in UiPassenger:", station);
-    console.log("Station ID:", station.id, "Type:", typeof station.id);
-    
     navigate('/station-lines', {
       state: { station }
     });
+  };
+
+  // Helper to extract city from route_long_name (like CompanyBusLines)
+  const getCityFromRoute = (routeLongName) => {
+    if (!routeLongName) return '';
+    try {
+      const originPart = routeLongName.split('<->')[0];
+      const cityParts = originPart.split('-');
+      return cityParts[cityParts.length - 1].trim();
+    } catch (e) {
+      return '';
+    }
   };
 
   return (
@@ -126,62 +141,25 @@ function UiPassenger() {
       <Header title="Transportation Planner" />
       <main className="signin-main">
         <div className="signin-container">
-          <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>
-            ברוך השב נוסע
-          </h2>
-          <div
-            style={{
-              display: "flex",
-              gap: "1rem",
-              justifyContent: "center",
-              marginBottom: "2rem",
-            }}
-          >
+          <h2 className="uipassenger-title">Welcome, Passenger</h2>
+          <div className="uipassenger-search-modes">
             <button
               onClick={() => handleSearchMode(SEARCH_MODES.STATION)}
-              style={{
-                background:
-                  searchMode === SEARCH_MODES.STATION ? "#7c3aed" : "#e0e7ff",
-                color: searchMode === SEARCH_MODES.STATION ? "#fff" : "#1e3a8a",
-                border: "none",
-                borderRadius: "8px",
-                padding: "0.5rem 1.5rem",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
+              className={`uipassenger-mode-btn${searchMode === SEARCH_MODES.STATION ? " active" : ""}`}
             >
-              חיפוש לפי שם תחנה
+              Search by Station Name
             </button>
             <button
               onClick={() => handleSearchMode(SEARCH_MODES.LOCATION)}
-              style={{
-                background:
-                  searchMode === SEARCH_MODES.LOCATION ? "#7c3aed" : "#e0e7ff",
-                color:
-                  searchMode === SEARCH_MODES.LOCATION ? "#fff" : "#1e3a8a",
-                border: "none",
-                borderRadius: "8px",
-                padding: "0.5rem 1.5rem",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
+              className={`uipassenger-mode-btn${searchMode === SEARCH_MODES.LOCATION ? " active" : ""}`}
             >
-              חיפוש לפי מיקום נוכחי
+              Search by Current Location
             </button>
             <button
               onClick={() => handleSearchMode(SEARCH_MODES.LINE)}
-              style={{
-                background:
-                  searchMode === SEARCH_MODES.LINE ? "#7c3aed" : "#e0e7ff",
-                color: searchMode === SEARCH_MODES.LINE ? "#fff" : "#1e3a8a",
-                border: "none",
-                borderRadius: "8px",
-                padding: "0.5rem 1.5rem",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
+              className={`uipassenger-mode-btn${searchMode === SEARCH_MODES.LINE ? " active" : ""}`}
             >
-              חיפוש לפי מספר קו
+              Search by Line Number
             </button>
           </div>
 
@@ -189,37 +167,37 @@ function UiPassenger() {
           {searchMode === SEARCH_MODES.STATION && (
             <form
               onSubmit={handleStationSearch}
-              style={{ marginBottom: "1.5rem" }}
+              className="uipassenger-search-form"
             >
-              <label>שם תחנה:</label>
+              <label>Station Name:</label>
               <input
                 type="text"
                 value={stationName}
                 onChange={(e) => setStationName(e.target.value)}
                 className="signin-input"
-                placeholder="הכנס שם תחנה"
+                placeholder="Enter station name"
                 required
                 style={{ marginBottom: "1rem" }}
               />
               <button type="submit" className="signin-button">
-                חפש
+                Search
               </button>
             </form>
           )}
 
           {/* Search by current location */}
           {searchMode === SEARCH_MODES.LOCATION && (
-            <div style={{ marginBottom: "1.5rem", textAlign: "center" }}>
+            <div className="uipassenger-location-search">
               <button
                 onClick={handleLocationSearch}
                 className="signin-button"
                 disabled={locationLoading}
               >
-                {locationLoading ? "מחפש מיקום..." : "מצא תחנות קרובות"}
+                {locationLoading ? "Locating..." : "Find Nearby Stations"}
               </button>
               {userLocation && (
-                <div style={{ fontSize: "0.9rem", marginTop: "0.5rem" }}>
-                  מיקום נוכחי: {userLocation.lat.toFixed(5)},{" "}
+                <div className="uipassenger-user-location">
+                  Current Location: {userLocation.lat.toFixed(5)}, {" "}
                   {userLocation.lng.toFixed(5)}
                 </div>
               )}
@@ -230,91 +208,87 @@ function UiPassenger() {
           {searchMode === SEARCH_MODES.LINE && (
             <form
               onSubmit={handleLineSearch}
-              style={{ marginBottom: "1.5rem" }}
+              className="uipassenger-search-form"
             >
-              <label>מספר קו:</label>
+              <label>Line Number:</label>
               <input
                 type="text"
                 value={lineNumber}
                 onChange={(e) => setLineNumber(e.target.value)}
                 className="signin-input"
-                placeholder="הכנס מספר קו"
+                placeholder="Enter line number"
                 required
                 style={{ marginBottom: "1rem" }}
               />
               <button type="submit" className="signin-button">
-                חפש
+                Search
               </button>
             </form>
           )}
 
           {/* Loading message */}
           {loading && (
-            <div style={{ textAlign: "center", padding: "1rem", color: "#6b7280" }}>
-              טוען תחנות...
+            <div className="uipassenger-loading-message">
+              Loading stations...
             </div>
           )}
 
           {/* Error message */}
           {error && (
-            <p style={{ color: "red", textAlign: "center" }}>{error}</p>
+            <p className="uipassenger-error-message">{error}</p>
           )}
 
           {/* Results */}
           {!loading && results.length > 0 && (
-            <div style={{ marginTop: "2rem" }}>
-              <h3 style={{ textAlign: "center", marginBottom: "1rem" }}>תוצאות חיפוש ({results.length}):</h3>
-              <div style={{ display: "grid", gap: "1rem" }}>
-                {results.map((station, idx) => (
-                  <div
-                    key={station.id || idx}
-                    onClick={() => handleStationClick(station)}
-                    style={{
-                      background: "white",
-                      border: "2px solid #e5e7eb",
-                      borderRadius: "12px",
-                      padding: "1rem",
-                      cursor: "pointer",
-                      transition: "all 0.3s ease",
-                      display: "flex",
-                      alignItems: "center",
-                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)"
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.borderColor = "#667eea";
-                      e.target.style.transform = "translateY(-2px)";
-                      e.target.style.boxShadow = "0 8px 24px rgba(102, 126, 234, 0.15)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.borderColor = "#e5e7eb";
-                      e.target.style.transform = "translateY(0)";
-                      e.target.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.05)";
-                    }}
-                  >
-                    <div style={{ fontSize: "2rem", marginLeft: "1rem" }}>🚌</div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: "600", fontSize: "1rem", color: "#1f2937", marginBottom: "0.25rem" }}>
-                        {station.name}
-                      </div>
-                      <div style={{ fontSize: "0.9rem", color: "#6b7280" }}>
-                        {station.city}
-                      </div>
-                      {station.distance && (
-                        <div style={{ fontSize: "0.8rem", color: "#9ca3af", marginTop: "0.25rem" }}>
-                          מרחק: {station.distance.toFixed(1)} ק"מ
+            <div className="uipassenger-results">
+              <h3 className="uipassenger-results-title">Search Results ({results.length}):</h3>
+              <div className="uipassenger-stations-grid">
+                {results.map((item, idx) => (
+                  searchMode === SEARCH_MODES.LINE ? (
+                    <div key={item.id || idx} className="uipassenger-station-card">
+                      <div className="uipassenger-station-icon">🚌</div>
+                      <div className="uipassenger-station-info">
+                        <div className="uipassenger-station-name">
+                          <strong>Route:</strong> {item.route_short_name}
                         </div>
-                      )}
+                        <div className="uipassenger-station-city">
+                          <strong>Long Name:</strong> {item.route_long_name}
+                        </div>
+                        <div className="uipassenger-station-city">
+                          <strong>Agency:</strong> {item.agency_name}
+                        </div>
+                        <div className="uipassenger-station-city">
+                          <strong>City:</strong> {getCityFromRoute(item.route_long_name)}
+                        </div>
+                      </div>
                     </div>
-                    <div style={{ fontSize: "1.5rem", color: "#9ca3af", marginRight: "0.5rem" }}>→</div>
-                  </div>
+                  ) : (
+                    <div
+                      key={item.id || idx}
+                      onClick={() => handleStationClick(item)}
+                      className="uipassenger-station-card"
+                    >
+                      <div className="uipassenger-station-icon">🚌</div>
+                      <div className="uipassenger-station-info">
+                        <div className="uipassenger-station-name">{item.name}</div>
+                        <div className="uipassenger-station-city">{item.city}</div>
+                        {item.distance && (
+                          <div className="uipassenger-station-distance">
+                            Distance: {item.distance.toFixed(1)} km
+                          </div>
+                        )}
+                      </div>
+                      <div className="uipassenger-arrow">→</div>
+                    </div>
+                  )
                 ))}
               </div>
             </div>
           )}
 
           {!loading && !error && results.length === 0 && searchMode !== SEARCH_MODES.LINE && (
-            <div style={{ textAlign: "center", padding: "2rem", color: "#6b7280" }}>
-              לא נמצאו תחנות. נסה חיפוש אחר.
+            <div className="uipassenger-no-results">
+              No stations found. Try another search.
             </div>
           )}
         </div>

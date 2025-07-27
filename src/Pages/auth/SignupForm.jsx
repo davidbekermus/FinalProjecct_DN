@@ -1,10 +1,10 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../Css/SignUp.css";
-import Footer from "../Components/Footer";
-import Header from "../Components/Header";
-import { signupValidation } from "../utils/validations";
+import "../../Css/SignUp.css";
+import Footer from "../../Components/Footer";
+import Header from "../../Components/Header";
+import { signupValidation } from "../../utils/validations";
 
 const SignupForm = () => {
   const nav = useNavigate();
