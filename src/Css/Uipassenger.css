@@ -84,3 +84,126 @@
   font-size: 0.9rem;
   margin-top: 0.25rem;
 }
+
+.uipassenger-title {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.uipassenger-search-modes {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.uipassenger-mode-btn {
+  background: #e0e7ff;
+  color: #1e3a8a;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.uipassenger-mode-btn.active {
+  background: #7c3aed;
+  color: #fff;
+}
+
+.uipassenger-search-form {
+  margin-bottom: 1.5rem;
+}
+
+.uipassenger-location-search {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.uipassenger-user-location {
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.uipassenger-loading-message {
+  text-align: center;
+  padding: 1rem;
+  color: #6b7280;
+}
+
+.uipassenger-error-message {
+  color: red;
+  text-align: center;
+}
+
+.uipassenger-results {
+  margin-top: 2rem;
+}
+
+.uipassenger-results-title {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.uipassenger-stations-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.uipassenger-station-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+.uipassenger-station-card:hover,
+.uipassenger-station-card:focus {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+}
+
+.uipassenger-station-icon {
+  font-size: 2rem;
+  margin-left: 1rem;
+}
+
+.uipassenger-station-info {
+  flex: 1;
+}
+
+.uipassenger-station-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.uipassenger-station-city {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.uipassenger-station-distance {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-top: 0.25rem;
+}
+
+.uipassenger-arrow {
+  font-size: 1.5rem;
+  color: #9ca3af;
+  margin-right: 0.5rem;
+}
+
+.uipassenger-no-results {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+}

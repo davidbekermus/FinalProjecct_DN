@@ -59,6 +59,9 @@ const Header = ({ title }) => {
           <Link to="/" className="nav-link">
             Home
           </Link>
+          <Link to="/plan-journey" className="nav-link">
+            Plan Journey
+          </Link>
           {user ? (
             <>
               <span className="nav-link" style={{ cursor: "default", fontWeight: 600 }}>

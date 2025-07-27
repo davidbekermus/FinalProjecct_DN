@@ -7,15 +7,14 @@ import UiDriver from "./Pages/UiDriver";
 import BusInfo from "./Pages/BusInfo";
 import BusStopInfo from "./Pages/BusStopInfo";
 import UiDriver_FinalInfo from "./Pages/Uidriver_FinalInfo";
-import LoginForm from "./Pages/LoginForm";
-import SignupForm from "./Pages/SignupForm";
-import Header from "./Components/Header";
-import Footer from "./Components/Footer";
+import LoginForm from "./Pages/auth/LoginForm";
+import SignupForm from "./Pages/auth/SignupForm";
 import AdminPage from "./Pages/AdminPage";
 import CompanyBusLines from "./Pages/CompanyBusLines";
 import BusLineRoute from "./Pages/BusLineRoute";
 import StationLines from "./Pages/StationLines";
 import axios from "axios";
+import MainPage from './planAJourney/MainPage';
 
 const routes = [
   { path: "/", element: <Home />, public: true, allowedRoles: ["passenger", "driver", "admin"] },
@@ -29,6 +28,7 @@ const routes = [
   { path: "/AdminPage", element: <AdminPage />, allowedRoles: ["admin"] },
   { path: "/company-bus-lines/:operatorRef", element: <CompanyBusLines />, public: true, allowedRoles: ["passenger", "driver", "admin"] },
   { path: "/bus-line-route/:gtfs_route_id", element: <BusLineRoute />, public: true, allowedRoles: ["passenger", "driver", "admin"] },
+  { path: "/plan-journey", element: <MainPage />, public: true, allowedRoles: ["passenger", "driver", "admin"] },
   { path: "/station-lines", element: <StationLines />, public: true, allowedRoles: ["passenger", "driver", "admin"] },
 ];
 

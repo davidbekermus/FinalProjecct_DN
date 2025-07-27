@@ -1,11 +1,11 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../Css/SignIn.css";
-import Footer from "../Components/Footer";
-import Header from "../Components/Header";
-import { signinValidation } from "../utils/validations";
-import { AuthContext } from "../App";
+import "../../Css/SignIn.css";
+import Footer from "../../Components/Footer";
+import Header from "../../Components/Header";
+import { signinValidation } from "../../utils/validations";
+import { AuthContext } from "../../App";
 import { useContext } from "react";
 
 const LoginForm = () => {

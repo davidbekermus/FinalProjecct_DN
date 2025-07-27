@@ -28,7 +28,7 @@ const BusInfo = () => {
     const fetchBusData = async () => {
       try {
         const response = await api.get(
-          "/gtfs_agencies/list"
+          "https://open-bus-stride-api.hasadna.org.il/gtfs_agencies/list"
         );
         const data = response.data;
         console.log('API Response:', data);
