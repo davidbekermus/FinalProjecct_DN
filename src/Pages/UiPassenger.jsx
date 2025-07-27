@@ -4,6 +4,7 @@ import Header from "../Components/Header";
 import Footer from "../Components/Footer";
 import "../Css/UiPassenger.css";
 import { api } from "../utils/api";
+import axios from "axios";
 
 const SEARCH_MODES = {
   STATION: "station",
@@ -33,8 +34,50 @@ function UiPassenger() {
 
   const handleStationSearch = async (e) => {
     e.preventDefault();
-    // TODO: fetch stations by name
-    setResults([`Search results for station: ${stationName}`]);
+    setError("");
+    setResults([]);
+    setLoading(true);
+
+    try {
+      // חיפוש תחנות מהשרת המקומי
+      const searchParams = new URLSearchParams();
+      if (stationName.trim()) {
+        // אם יש טקסט חיפוש, נחפש גם בשם וגם בעיר
+        searchParams.append('name', stationName.trim());
+        searchParams.append('city', stationName.trim());
+      }
+      searchParams.append('limit', '50');
+      
+      const res = await axios.get(`http://localhost:3000/stations?${searchParams.toString()}`);
+      const data = res.data;
+      
+      // אם חיפשנו גם בעיר, נעשה חיפוש נוסף
+      let allStations = data.stations || [];
+      
+      if (stationName.trim()) {
+        // חיפוש נוסף בעיר אם לא מצאנו מספיק תוצאות
+        if (allStations.length < 10) {
+          const cityRes = await axios.get(`http://localhost:3000/stations?city=${encodeURIComponent(stationName.trim())}&limit=30`);
+          const cityStations = cityRes.data.stations || [];
+          
+          // מיזוג התוצאות ומניעת כפילויות
+          const existingIds = new Set(allStations.map(s => s.id));
+          const newStations = cityStations.filter(s => !existingIds.has(s.id));
+          allStations = [...allStations, ...newStations];
+        }
+      }
+      
+      // סינון נוסף בצד הלקוח למקרה שהשרת לא סינן מספיק טוב
+      const filtered = allStations.filter((s) =>
+        s.city?.toLowerCase().includes(stationName.toLowerCase()) ||
+        s.name?.toLowerCase().includes(stationName.toLowerCase())
+      );
+      
+      setResults(filtered.slice(0, 20)); // הגבלה ל-20 תוצאות
+    } catch (err) {
+      setError("שגיאה בחיפוש תחנות");
+    }
+    setLoading(false);
   };
 
   const handleLineSearch = async (e) => {
@@ -65,6 +108,7 @@ function UiPassenger() {
     }
     setLocationLoading(true);
     setLoading(true);
+
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         try {
@@ -72,18 +116,12 @@ function UiPassenger() {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           });
-          const res = await fetch(
-            "https://open-bus-stride-api.hasadna.org.il/gtfs_stops/list?limit=1000"
-          );
-          const data = await res.json();
-          const allStations = data.map((stop) => ({
-            id: stop.id,
-            name: stop.name,
-            city: stop.city,
-            lat: stop.lat,
-            lon: stop.lon,
-            code: stop.code,
-          }));
+
+          // שליפת תחנות מהשרת המקומי
+          const res = await axios.get('http://localhost:3000/stations?limit=1000');
+          const data = res.data;
+          const allStations = data.stations || [];
+
           // חישוב מרחק
           const calcDist = (lat1, lon1, lat2, lon2) => {
             const R = 6371;
@@ -96,18 +134,26 @@ function UiPassenger() {
                 Math.sin(dLon / 2) ** 2;
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
           };
+
           const sorted = allStations
             .map((s) => ({
               ...s,
-              distance: calcDist(position.coords.latitude, position.coords.longitude, s.lat, s.lon),
+              distance: calcDist(
+                position.coords.latitude,
+                position.coords.longitude,
+                s.lat,
+                s.lon
+              ),
             }))
             .filter((s) => s.distance <= 3)
             .sort((a, b) => a.distance - b.distance);
+
           setResults(sorted);
         } catch (err) {
           setError("Error searching for stations");
         }
         setLocationLoading(false);
+        setLoading(false);
         setLoading(false);
       },
       () => {
@@ -119,8 +165,12 @@ function UiPassenger() {
   };
 
   const handleStationClick = (station) => {
-    navigate('/station-lines', {
-      state: { station }
+    // ניווט לעמוד הקווים עם נתוני התחנה
+    console.log("Station clicked in UiPassenger:", station);
+    console.log("Station ID:", station.id, "Type:", typeof station.id);
+
+    navigate("/station-lines", {
+      state: { station },
     });
   };
 
@@ -228,8 +278,10 @@ function UiPassenger() {
 
           {/* Loading message */}
           {loading && (
-            <div className="uipassenger-loading-message">
-              Loading stations...
+            <div
+              style={{ textAlign: "center", padding: "1rem", color: "#6b7280" }}
+            >
+              טוען תחנות...
             </div>
           )}
 
@@ -240,26 +292,52 @@ function UiPassenger() {
 
           {/* Results */}
           {!loading && results.length > 0 && (
-            <div className="uipassenger-results">
-              <h3 className="uipassenger-results-title">Search Results ({results.length}):</h3>
-              <div className="uipassenger-stations-grid">
-                {results.map((item, idx) => (
-                  searchMode === SEARCH_MODES.LINE ? (
-                    <div key={item.id || idx} className="uipassenger-station-card">
-                      <div className="uipassenger-station-icon">🚌</div>
-                      <div className="uipassenger-station-info">
-                        <div className="uipassenger-station-name">
-                          <strong>Route:</strong> {item.route_short_name}
-                        </div>
-                        <div className="uipassenger-station-city">
-                          <strong>Long Name:</strong> {item.route_long_name}
-                        </div>
-                        <div className="uipassenger-station-city">
-                          <strong>Agency:</strong> {item.agency_name}
-                        </div>
-                        <div className="uipassenger-station-city">
-                          <strong>City:</strong> {getCityFromRoute(item.route_long_name)}
-                        </div>
+            <div style={{ marginTop: "2rem" }}>
+              <h3 style={{ textAlign: "center", marginBottom: "1rem" }}>
+                תוצאות חיפוש ({results.length}):
+              </h3>
+              <div style={{ display: "grid", gap: "1rem" }}>
+                {results.map((station, idx) => (
+                  <div
+                    key={station.id || idx}
+                    onClick={() => handleStationClick(station)}
+                    style={{
+                      background: "white",
+                      border: "2px solid #e5e7eb",
+                      borderRadius: "12px",
+                      padding: "1rem",
+                      cursor: "pointer",
+                      transition: "all 0.3s ease",
+                      display: "flex",
+                      alignItems: "center",
+                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.borderColor = "#667eea";
+                      e.target.style.transform = "translateY(-2px)";
+                      e.target.style.boxShadow =
+                        "0 8px 24px rgba(102, 126, 234, 0.15)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.borderColor = "#e5e7eb";
+                      e.target.style.transform = "translateY(0)";
+                      e.target.style.boxShadow =
+                        "0 2px 8px rgba(0, 0, 0, 0.05)";
+                    }}
+                  >
+                    <div style={{ fontSize: "2rem", marginLeft: "1rem" }}>
+                      🚌
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div
+                        style={{
+                          fontWeight: "600",
+                          fontSize: "1rem",
+                          color: "#1f2937",
+                          marginBottom: "0.25rem",
+                        }}
+                      >
+                        {station.name}
                       </div>
                     </div>
                   ) : (
@@ -278,19 +356,47 @@ function UiPassenger() {
                           </div>
                         )}
                       </div>
-                      <div className="uipassenger-arrow">→</div>
+                      {station.distance && (
+                        <div
+                          style={{
+                            fontSize: "0.8rem",
+                            color: "#9ca3af",
+                            marginTop: "0.25rem",
+                          }}
+                        >
+                          מרחק: {station.distance.toFixed(1)} ק"מ
+                        </div>
+                      )}
                     </div>
-                  )
+                    <div
+                      style={{
+                        fontSize: "1.5rem",
+                        color: "#9ca3af",
+                        marginRight: "0.5rem",
+                      }}
+                    >
+                      →
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
           )}
 
-          {!loading && !error && results.length === 0 && searchMode !== SEARCH_MODES.LINE && (
-            <div className="uipassenger-no-results">
-              No stations found. Try another search.
-            </div>
-          )}
+          {!loading &&
+            !error &&
+            results.length === 0 &&
+            searchMode !== SEARCH_MODES.LINE && (
+              <div
+                style={{
+                  textAlign: "center",
+                  padding: "2rem",
+                  color: "#6b7280",
+                }}
+              >
+                לא נמצאו תחנות. נסה חיפוש אחר.
+              </div>
+            )}
         </div>
       </main>
       <Footer />

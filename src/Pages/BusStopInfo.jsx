@@ -3,6 +3,7 @@ import Header from "../Components/Header";
 import Footer from "../Components/Footer";
 import "../Css/BusStopInfo.css";
 import { api } from "../utils/api";
+import axios from "axios";
 
 const LocationIcon = () => (
   <svg
@@ -40,12 +41,11 @@ const BusStopInfo = () => {
     const fetchStations = async () => {
       setLoading(true);
       try {
-        const res = await api.get(
-          "/gtfs_stops/list?limit=1000"
-        );
+        // שליפת תחנות מהשרת המקומי
+        const res = await axios.get('http://localhost:3000/stations?limit=1000');
         const data = res.data;
         setStations(
-          data.map((stop) => ({
+          (data.stations || []).map((stop) => ({
             id: stop.id,
             name: stop.name,
             city: stop.city,
@@ -127,40 +127,24 @@ const BusStopInfo = () => {
     setLines([]);
 
     try {
-      // שליפת ה-ride stops לפי stop_id (id של התחנה)
-      const resRideStops = await api.get(
-        `/gtfs_ride_stops/list?stop_id=${station.id}&get_count=false&order_by=id%20asc`
-      );
-      const rideStopsData = resRideStops.data;
+      // שליפת קווים מהשרת המקומי לפי מזהה התחנה
+      const response = await axios.get(`http://localhost:3000/routes/station/${station.id}`);
+      const data = response.data;
 
-      if (!rideStopsData || rideStopsData.length === 0) {
+      if (!data.routes || data.routes.length === 0) {
         setLines(["לא נמצאו קווים לתחנה זו"]);
         setLoading(false);
         return;
       }
 
-      // שולפים את כל ה-route_id ייחודיים
-      const uniqueRouteIds = [...new Set(rideStopsData.map(item => item.route_id))];
-
-      // שליפת פרטי הקווים לפי ה-route_id
-      const queryParams = uniqueRouteIds.map(id => `route_id=${id}`).join("&");
-      const resRoutes = await api.get(
-        `/gtfs_routes/list?${queryParams}`
-      );
-      const routesData = resRoutes.data;
-
-      if (!routesData || routesData.length === 0) {
-        // אם אין מידע מפורט, נראה רק את המספרים
-        setLines(uniqueRouteIds.map(id => `קו ${id}`));
-      } else {
-        // יוצרים מערך של שמות קווים להציג
-        const linesArr = routesData.map(route => {
-          const shortName = route.route_short_name || "";
-          const longName = route.route_long_name ? ` • ${route.route_long_name}` : "";
-          return `${shortName}${longName}`;
-        });
-        setLines(linesArr);
-      }
+      // עיבוד הקווים להצגה
+      const linesArr = data.routes.map(route => {
+        const shortName = route.busLineId?.route_short_name || "לא ידוע";
+        const longName = route.busLineId?.route_long_name;
+        return longName ? `${shortName} • ${longName}` : shortName;
+      });
+      
+      setLines(linesArr);
     } catch (err) {
       console.error("שגיאה בשליפת הקווים:", err);
       setError("שגיאה בשליפת הקווים");

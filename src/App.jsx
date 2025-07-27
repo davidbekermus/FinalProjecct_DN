@@ -29,6 +29,7 @@ const routes = [
   { path: "/company-bus-lines/:operatorRef", element: <CompanyBusLines />, public: true, allowedRoles: ["passenger", "driver", "admin"] },
   { path: "/bus-line-route/:gtfs_route_id", element: <BusLineRoute />, public: true, allowedRoles: ["passenger", "driver", "admin"] },
   { path: "/plan-journey", element: <MainPage />, public: true, allowedRoles: ["passenger", "driver", "admin"] },
+  { path: "/station-lines", element: <StationLines />, public: true, allowedRoles: ["passenger", "driver", "admin"] },
 ];
 
 // Create AuthContext

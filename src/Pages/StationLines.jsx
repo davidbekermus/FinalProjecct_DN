@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
 import "../Css/StationLines.css";
+import axios from "axios";
 
 const StationLines = () => {
   const location = useLocation();
@@ -48,14 +49,10 @@ const StationLines = () => {
       const localServerUrl = `http://localhost:3000/routes/station/${stationData.id}`;
       console.log("Fetching routes from local server:", localServerUrl);
 
-      const response = await fetch(localServerUrl);
+      const response = await axios.get(localServerUrl);
       console.log("Local server response status:", response.status);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = response.data;
       console.log("Routes data from local server:", data);
 
       if (!data.routes || data.routes.length === 0) {
@@ -67,7 +64,9 @@ const StationLines = () => {
 
       // שמירת מידע על מספר הקווים המקוריים
       const originalCount = data.originalCount || data.routes.length;
-      console.log(`Original routes: ${originalCount}, Total shown: ${data.routes.length}`);
+      console.log(
+        `Original routes: ${originalCount}, Total shown: ${data.routes.length}`
+      );
 
       // עיבוד הנתונים - כל route כבר מכיל את פרטי הקו (busLineId populated)
       const processedLines = data.routes.map((route) => ({
@@ -76,7 +75,10 @@ const StationLines = () => {
         route_long_name: route.busLineId?.route_long_name || "לא ידוע",
         agency_name: route.busLineId?.agency_name || "לא ידוע",
         gtfs_route_id: route.busLineId?.gtfs_route_id || route._id,
-        routeDescription: route.routeDescription || route.busLineId?.route_desc || "מסלול לא זמין", // מידע על המסלול
+        routeDescription:
+          route.routeDescription ||
+          route.busLineId?.route_desc ||
+          "מסלול לא זמין", // מידע על המסלול
         busLineId: route.busLineId,
       }));
 
@@ -106,13 +108,13 @@ const StationLines = () => {
 
   const handleLineClick = (line) => {
     // ניווט לעמוד פרטי הקו עם הנתונים הנכונים
-    console.log('Navigating to bus line route with:', line);
+    console.log("Navigating to bus line route with:", line);
     navigate(`/bus-line-route/${line.gtfs_route_id}`, {
       state: {
         routeShortName: line.route_short_name,
         routeLongName: line.route_long_name,
         agencyName: line.agency_name,
-        line: line // שמירה על הנתונים המקוריים
+        line: line, // שמירה על הנתונים המקוריים
       },
     });
   };
@@ -163,7 +165,14 @@ const StationLines = () => {
               קווים המגיעים לתחנה ({lines.length})
             </h3>
             {lines.length >= 10 && (
-              <p style={{ textAlign: "center", fontSize: "0.9rem", color: "#6b7280", marginBottom: "1rem" }}>
+              <p
+                style={{
+                  textAlign: "center",
+                  fontSize: "0.9rem",
+                  color: "#6b7280",
+                  marginBottom: "1rem",
+                }}
+              >
                 מוצגים 10 קווים (כולל קווים נוספים להשלמה במידת הצורך)
               </p>
             )}

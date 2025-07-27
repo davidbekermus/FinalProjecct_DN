@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
-import Header from '../Components/Header';
-import Footer from '../Components/Footer';
-import '../Css/BusLineRoute.css';
-import { api } from '../utils/api';
+import React, { useEffect, useState } from "react";
+import { useParams, useLocation } from "react-router-dom";
+import Header from "../Components/Header";
+import Footer from "../Components/Footer";
+import "../Css/BusLineRoute.css";
+import { api } from "../utils/api";
 
 const BusLineRoute = () => {
   const { gtfs_route_id } = useParams();
@@ -26,7 +26,7 @@ const BusLineRoute = () => {
         );
         const journeys = journeyRes.data;
         if (!Array.isArray(journeys) || journeys.length === 0) {
-          setError('No journeys found for this route.');
+          setError("No journeys found for this route.");
           setLoading(false);
           return;
         }
@@ -49,14 +49,20 @@ const BusLineRoute = () => {
 
   return (
     <div className="bus-line-route-container">
-      <Header title={`line :${location.state?.routeShortName || gtfs_route_id}`} />
+      <Header
+        title={`line :${location.state?.routeShortName || gtfs_route_id}`}
+      />
       <main className="bus-line-route-main">
         <div className="content-wrapper">
           <h2>Bus Line Route</h2>
           {location.state && (
             <div className="route-info">
-              <p><strong>Route Name:</strong> {location.state.routeLongName}</p>
-              <p><strong>Company:</strong> {location.state.agencyName}</p>
+              <p>
+                <strong>Route Name:</strong> {location.state.routeLongName}
+              </p>
+              <p>
+                <strong>Company:</strong> {location.state.agencyName}
+              </p>
             </div>
           )}
           {loading ? (
@@ -87,4 +93,4 @@ const BusLineRoute = () => {
   );
 };
 
-export default BusLineRoute;
+export default BusLineRoute; 
