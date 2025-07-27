@@ -36,7 +36,8 @@ const ResultsDisplay = ({
   showStationSearch,
   allStations,
   stationsLoading,
-  searchType
+  searchType,
+  showBusCompanies
 }) => {
   // State for bus lines, loading, error, and pagination
   const [busLines, setBusLines] = useState([]);
@@ -311,6 +312,25 @@ const ResultsDisplay = ({
     });
   }
   const uniqueResults = removeDuplicates(filteredResults || []);
+
+  // Show bus companies when FilterByCompany is clicked
+  if (showBusCompanies) {
+    return (
+      <div className="results-display">
+        {uniqueResults && uniqueResults.length > 0 ? (
+          <div className="results-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+            {uniqueResults.map((company, idx) => (
+              <div key={idx} className="company-card" style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '1rem', background: '#fafafa', textAlign: 'center' }}>
+                {company.agency_name || 'Unknown Company'}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="results-empty-placeholder">No bus companies found</div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="results-display">

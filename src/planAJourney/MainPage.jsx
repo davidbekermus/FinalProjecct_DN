@@ -6,6 +6,7 @@ import SearchBar from './components/SearchBar';
 import FilterByLocation from './components/FilterByLocation';
 import FilterByline from './components/FilterByline';
 import FilterByStation from './components/FilterByStation';
+import FilterByCompany from './components/FilterByCompany';
 import ResultsDisplay from './components/ResultsDisplay';
 import '../Css/planAjourney/MainPage.css';
 
@@ -36,6 +37,7 @@ const MainPage = () => {
   const [allStations, setAllStations] = useState([]);
   const [stationsLoading, setStationsLoading] = useState(false);
   const [searchType, setSearchType] = useState('agency_name'); // Added for dropdown search options
+  const [showBusCompanies, setShowBusCompanies] = useState(false); // Added for bus companies
 
   // Reset search term when switching modes
   useEffect(() => {
@@ -47,10 +49,12 @@ const MainPage = () => {
       setSearchType('station_name');
     } else if (showStationSearch) {
       setSearchType('station_name');
+    } else if (showBusCompanies) {
+      setSearchType('agency_name');
     } else {
       setSearchType('agency_name');
     }
-  }, [showBusLines, showNearbyStations, showStationSearch]); // Updated dependencies
+  }, [showBusLines, showNearbyStations, showStationSearch, showBusCompanies]); // Updated dependencies
 
   useEffect(() => {
     const fetchBusData = async () => {
@@ -90,6 +94,7 @@ const MainPage = () => {
     setShowBusLines(false);
     setShowNearbyStations(true);
     setShowStationSearch(false);
+    setShowBusCompanies(false);
     setLocationLoading(true);
     setError(null);
     if (!navigator.geolocation) {
@@ -101,9 +106,13 @@ const MainPage = () => {
       async (position) => {
         try {
           // Fetch from local database route
-          const response = await api.get('/stations');
+          const response = await api.get('/stations?limit=50000');
           const data = response.data;
-          const allStations = data.map((stop) => ({
+          
+          // Handle the response format - stations route returns {stations: [...]}
+          const stationsArray = data.stations || data;
+          
+          const allStations = stationsArray.map((stop) => ({
             id: stop.id,
             name: stop.name,
             city: stop.city,
@@ -150,16 +159,20 @@ const MainPage = () => {
     setShowBusLines(false);
     setShowNearbyStations(false);
     setShowStationSearch(true);
+    setShowBusCompanies(false);
     setStationsLoading(true);
     setError(null);
     
     try {
       // Fetch from local database route
-      const response = await api.get('/stations');
+      const response = await api.get('/stations?limit=50000');
       const data = response.data;
       
+      // Handle the response format - stations route returns {stations: [...]}
+      const stationsArray = data.stations || data;
+      
       // Transform the data to match the expected format
-      const stations = data.map((stop) => ({
+      const stations = stationsArray.map((stop) => ({
         id: stop.id,
         name: stop.name,
         city: stop.city,
@@ -181,7 +194,16 @@ const MainPage = () => {
     if (showBusLines) return 'bus_lines';
     if (showNearbyStations) return 'nearby_stations';
     if (showStationSearch) return 'station';
+    if (showBusCompanies) return 'default';
     return 'default';
+  };
+
+  // Handler for FilterByCompany click
+  const handleCompanyClick = () => {
+    setShowBusLines(false);
+    setShowNearbyStations(false);
+    setShowStationSearch(false);
+    setShowBusCompanies(true);
   };
 
   return (
@@ -195,7 +217,7 @@ const MainPage = () => {
             onSubmit={handleSearch}
             searchType={searchType}
             onSearchTypeChange={handleSearchTypeChange}
-            placeholder={showBusLines ? 'Search by line number...' : showNearbyStations ? 'Search by station name...' : showStationSearch ? 'Search by station name...' : 'Search by agency name...'}
+            placeholder={showBusLines ? 'Search by line number...' : showNearbyStations ? 'Search by station name...' : showStationSearch ? 'Search by station name...' : showBusCompanies ? 'Search by agency name...' : 'Search by agency name...'}
             searchMode={getCurrentSearchMode()}
           />
         </div>
@@ -203,8 +225,9 @@ const MainPage = () => {
           {/* Right: Three filter/result-type components */}
           <div className="mainpage-right">
             <FilterByLocation onClick={handleLocationClick} />
-            <FilterByline onClick={() => { setShowBusLines(true); setShowNearbyStations(false); setShowStationSearch(false); }} />
+            <FilterByline onClick={() => { setShowBusLines(true); setShowNearbyStations(false); setShowStationSearch(false); setShowBusCompanies(false); }} />
             <FilterByStation onClick={handleStationSearchClick} />
+            <FilterByCompany onClick={handleCompanyClick} />
           </div>
           {/* Left: Results container */}
           <div className="mainpage-left">
@@ -223,6 +246,7 @@ const MainPage = () => {
                 allStations={allStations}
                 stationsLoading={stationsLoading}
                 searchType={searchType}
+                showBusCompanies={showBusCompanies}
               />
             )}
           </div>
