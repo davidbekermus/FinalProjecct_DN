@@ -238,14 +238,107 @@
   box-shadow: 0 2px 8px rgba(59,130,246,0.06);
 }
 
+/* Company lines styles */
 .company-card {
-  transition: box-shadow 0.2s;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(59,130,246,0.04);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  background: #fafafa;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .company-card:hover {
-  box-shadow: 0 4px 16px rgba(59,130,246,0.12);
+  background: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59,130,246,0.15);
+}
+
+.company-lines-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.company-line-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+.company-line-card:hover {
+  box-shadow: 0 4px 12px rgba(59,130,246,0.15);
+  transform: translateY(-2px);
+}
+
+.back-button {
+  padding: 0.5rem 1rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.back-button:hover {
+  background: #2563eb;
+}
+
+.company-header {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.company-title {
+  margin: 0;
+  color: #1f2937;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.line-number {
+  color: #1f2937;
+  font-size: 1.1em;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.line-description {
+  color: #6b7280;
+  font-size: 0.9em;
+  margin-top: 0.5rem;
+}
+
+/* Company grid styles */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+/* Error and loading states for company lines */
+.company-lines-error {
+  color: #dc2626;
+  padding: 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.company-lines-loading {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
 }
 
 /* Station search styles */

@@ -3,8 +3,8 @@
   min-height: calc(100vh - 160px);
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 100px;
+  align-items: flex-start;
+  padding: 100px 20px;
 }
 
 .ui-driver-container {
@@ -13,7 +13,7 @@
   border-radius: 12px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 400px;
+  max-width: 800px;
 }
 
 .ui-driver-container h2 {
@@ -78,4 +78,109 @@ button {
 
 button:hover {
   background-color: #6d28d9;
+}
+
+button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Search Results Styles */
+.search-results {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid #e5e7eb;
+}
+
+.search-results h3 {
+  color: #7c3aed;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.results-count {
+  text-align: center;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.bus-lines-list {
+  display: grid;
+  gap: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.bus-line-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.bus-line-card:hover {
+  border-color: #7c3aed;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.1);
+}
+
+.bus-line-info h4 {
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.bus-line-info p {
+  margin: 0.25rem 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.select-route-btn {
+  background-color: #10b981;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: auto;
+  margin: 0;
+}
+
+.select-route-btn:hover {
+  background-color: #059669;
+}
+
+.no-results {
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+  padding: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ui-driver-container {
+    max-width: 100%;
+    margin: 0 1rem;
+  }
+  
+  .bus-line-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .select-route-btn {
+    width: 100%;
+  }
 }

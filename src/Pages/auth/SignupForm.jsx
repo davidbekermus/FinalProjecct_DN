@@ -5,9 +5,12 @@ import "../../Css/SignUp.css";
 import Footer from "../../Components/Footer";
 import Header from "../../Components/Header";
 import { signupValidation } from "../../utils/validations";
+import { AuthContext } from "../../App";
+import { useContext } from "react";
 
 const SignupForm = () => {
   const nav = useNavigate();
+  const { setUser, setToken } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -37,8 +40,53 @@ const SignupForm = () => {
     }
     try {
       setIsLoading(true);
-      await axios.post("http://localhost:3000/auth/signup", formData);
+      const signupResponse = await axios.post("http://localhost:3000/auth/signup", formData);
+      
+      // Check if this is a driver signup
+      if (formData.role === "driver") {
+        setError("");
+        alert("Driver account created successfully! Please wait for admin approval before logging in.");
+        nav("/Login");
+        return;
+      }
+
       setError("");
+      // Automatically log the user in after signup (only for non-drivers)
+      const loginRes = await axios.post("http://localhost:3000/auth/login", {
+        email: formData.email,
+        password: formData.password
+      });
+      if (loginRes.data?.token && loginRes.data?.user) {
+        localStorage.setItem("token", loginRes.data.token);
+        setUser(loginRes.data.user);
+        if (typeof setToken === "function") setToken(loginRes.data.token);
+        // Check for pending route counter data
+        const pendingRouteCounter = localStorage.getItem("pendingRouteCounter");
+        if (pendingRouteCounter) {
+          try {
+            const parsedData = JSON.parse(pendingRouteCounter);
+            const dataAge = Date.now() - parsedData.timestamp;
+            if (dataAge < 5 * 60 * 1000) {
+              nav("/RouteCounter", { state: parsedData });
+              return;
+            } else {
+              localStorage.removeItem("pendingRouteCounter");
+            }
+          } catch (error) {
+            localStorage.removeItem("pendingRouteCounter");
+          }
+        }
+        // Default navigation after signup+login
+        if (loginRes.data.user.role === "admin") {
+          nav("/AdminPage");
+        } else if (loginRes.data.user.role === "driver") {
+          nav("/UiDriver");
+        } else {
+          nav("/UiPassenger");
+        }
+        return;
+      }
+      // fallback if login fails
       nav("/Login");
     } catch (err) {
       console.error(err);

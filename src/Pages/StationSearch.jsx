@@ -167,10 +167,6 @@ function StationSearch() {
     setStationLines([]);
   };
 
-  const handleViewBusInfo = () => {
-    navigate("/BusInfo");
-  };
-
   return (
     <>
       <Header title="חיפוש תחנות" />
@@ -301,15 +297,6 @@ function StationSearch() {
                     </div>
                   ))}
                 </div>
-              </div>
-
-              <div className="action-buttons">
-                <button
-                  onClick={handleViewBusInfo}
-                  className="view-bus-info-button"
-                >
-                  צפה במידע על האוטובוסים
-                </button>
               </div>
             </div>
           )}

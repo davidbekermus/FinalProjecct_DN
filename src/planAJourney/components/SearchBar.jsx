@@ -43,6 +43,11 @@ const SearchBar = ({ value, onChange, onSubmit, placeholder = 'Search...', searc
         { key: 'city_name', label: 'Search by City Name' },
         { key: 'station_code', label: 'Search by Station Code' }
       ];
+    } else if (searchMode === 'company_lines') {
+      return [
+        { key: 'route_short_name', label: 'Search by Line Number' },
+        { key: 'city_name', label: 'Search by City Name' }
+      ];
     } else {
       return [
         { key: 'agency_name', label: 'Search by Agency Name' }

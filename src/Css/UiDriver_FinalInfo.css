@@ -18,6 +18,33 @@
   margin-top: 2rem;
 }
 
+.route-details,
+.search-criteria {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #007bff;
+}
+
+.route-info,
+.criteria-info {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.route-info p,
+.criteria-info p {
+  margin: 0;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.route-info p:last-child,
+.criteria-info p:last-child {
+  border-bottom: none;
+}
+
 .ui-driver-finalinfo-stop,
 .ui-driver-finalinfo-passengers {
   margin-bottom: 1.5rem;
@@ -60,4 +87,22 @@ h2 {
 h3 {
   color: #2c3e50;
   margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ui-driver-finalinfo-container {
+    padding: 0 0.5rem;
+  }
+  
+  .ui-driver-finalinfo-card {
+    padding: 1rem;
+  }
+  
+  .route-details,
+  .search-criteria {
+    padding: 1rem;
+  }
 }
