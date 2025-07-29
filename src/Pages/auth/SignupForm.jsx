@@ -82,7 +82,7 @@ const SignupForm = () => {
         } else if (loginRes.data.user.role === "driver") {
           nav("/UiDriver");
         } else {
-          nav("/UiPassenger");
+          nav("/plan-journey");
         }
         return;
       }

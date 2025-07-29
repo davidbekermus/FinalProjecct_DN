@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Header from '../Components/Header';
-import Footer from '../Components/Footer';
-import { api } from '../utils/api';
-import '../Css/DriverRouteManager.css';
+import Header from '../../Components/Header';
+import Footer from '../../Components/Footer';
+import { api } from '../../utils/api';
+import '../../Css/DriverRouteManager.css';
 
 const DriverRouteManager = () => {
   const location = useLocation();
