@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import { api } from '../utils/api';
-import Header from '../Components/Header';
-import Footer from '../Components/Footer';
+import { api } from '../../../utils/api';
+import Header from '../../../Components/Header';
+import Footer from '../../../Components/Footer';
 import SearchBar from './components/SearchBar';
 import FilterByLocation from './components/FilterByLocation';
 import FilterByline from './components/FilterByline';
 import FilterByStation from './components/FilterByStation';
 import FilterByCompany from './components/FilterByCompany';
 import ResultsDisplay from './components/ResultsDisplay';
-import '../Css/planAjourney/MainPage.css';
+import '../../../Css/planAjourney/MainPage.css';
 
 // Deduplicate by agency_name (case-insensitive)
 const removeDuplicates = (data) => {

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import Header from "../Components/Header";
-import Footer from "../Components/Footer";
-import "../Css/StationLines.css";
-import { api } from "../utils/api";
+import Header from "../../Components/Header";
+import Footer from "../../Components/Footer";
+import "../../Css/StationLines.css";
+import { api } from "../../utils/api";
 
 const StationLines = () => {
   const location = useLocation();

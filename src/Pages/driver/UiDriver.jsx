@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
-import Header from "../Components/Header";
-import Footer from "../Components/Footer";
-import "../Css/UiDriver.css";
+import Header from "../../Components/Header";
+import Footer from "../../Components/Footer";
+import "../../Css/UiDriver.css";
 import { useNavigate } from "react-router-dom";
 
 const UiDriver = () => {

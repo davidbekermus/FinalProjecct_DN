@@ -78,8 +78,8 @@ const LoginForm = () => {
         console.log("Navigating to /UiDriver");
         nav("/UiDriver");
       } else {
-        console.log("Navigating to /UiPassenger");
-        nav("/UiPassenger");
+        console.log("Navigating to /plan-journey");
+        nav("/plan-journey");
       }
       setError("");
 

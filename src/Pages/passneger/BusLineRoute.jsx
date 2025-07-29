@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import Header from "../Components/Header";
-import Footer from "../Components/Footer";
-import "../Css/BusLineRoute.css";
-import { api } from "../utils/api";
+import Header from "../../Components/Header";
+import Footer from "../../Components/Footer";
+import "../../Css/BusLineRoute.css";
+import { api } from "../../utils/api";
 
 const BusLineRoute = () => {
   const { gtfs_route_id } = useParams();
