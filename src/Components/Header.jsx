@@ -56,17 +56,26 @@ const Header = ({ title }) => {
 
         {/* Nav links */}
         <nav className="nav-links">
-          <Link to="/" className="nav-link">
-            Home
-          </Link>
-          <Link to="/plan-journey" className="nav-link">
-            Plan Journey
-          </Link>
+          {!user || user.role !== "driver" ? (
+            <Link to="/plan-journey" className="nav-link">
+              Plan Journey
+            </Link>
+          ) : null}
+          {user && user.role === "driver" && (
+            <Link to="/UiDriver" className="nav-link">
+              Start a Journey
+            </Link>
+          )}
           {user ? (
             <>
               <span className="nav-link" style={{ cursor: "default", fontWeight: 600 }}>
                 Hello {user.name}
               </span>
+              {user.role === "admin" && (
+                <Link to="/AdminPage" className="nav-link">
+                  Admin
+                </Link>
+              )}
               <button className="nav-link" onClick={handleSignOut} style={{ background: "none", border: "none", cursor: "pointer" }}>
                 Sign Out
               </button>
@@ -81,19 +90,7 @@ const Header = ({ title }) => {
               </Link>
             </>
           )}
-          <div className="transit-info-dropdown">
-            <Link to="#" className="nav-link transit-info-link">
-              Transit Info
-            </Link>
-            <div className="dropdown-content">
-              <Link to="/BusInfo" className="dropdown-link">
-                Bus Info
-              </Link>
-              <Link to="/BusStopInfo" className="dropdown-link">
-                Bus Stop Info
-              </Link>
-            </div>
-          </div>
+
         </nav>
       </div>
     </header>

@@ -48,6 +48,28 @@ const LoginForm = () => {
       setUser(data.user);
       if (typeof setToken === "function") setToken(data.token);
 
+      // Check if there's pending route counter data
+      const pendingRouteCounter = localStorage.getItem("pendingRouteCounter");
+      if (pendingRouteCounter) {
+        try {
+          const parsedData = JSON.parse(pendingRouteCounter);
+          const dataAge = Date.now() - parsedData.timestamp;
+          
+          // Only redirect if data is less than 5 minutes old
+          if (dataAge < 5 * 60 * 1000) {
+            console.log("Found pending route counter data, redirecting to RouteCounter");
+            nav("/RouteCounter", { state: parsedData });
+            return;
+          } else {
+            // Data is too old, clear it
+            localStorage.removeItem("pendingRouteCounter");
+          }
+        } catch (error) {
+          console.error("Error parsing pending route counter data:", error);
+          localStorage.removeItem("pendingRouteCounter");
+        }
+      }
+
       console.log("User role:", data.user.role);
       if (data.user.role === "admin") {
         console.log("Navigating to /AdminPage");

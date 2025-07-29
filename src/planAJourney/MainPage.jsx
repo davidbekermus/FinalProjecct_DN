@@ -38,6 +38,7 @@ const MainPage = () => {
   const [stationsLoading, setStationsLoading] = useState(false);
   const [searchType, setSearchType] = useState('agency_name'); // Added for dropdown search options
   const [showBusCompanies, setShowBusCompanies] = useState(false); // Added for bus companies
+  const [selectedCompany, setSelectedCompany] = useState(null); // Added for FilterByCompany
 
   // Reset search term when switching modes
   useEffect(() => {
@@ -50,11 +51,13 @@ const MainPage = () => {
     } else if (showStationSearch) {
       setSearchType('station_name');
     } else if (showBusCompanies) {
-      setSearchType('agency_name');
+      setSearchType('route_short_name');
+    } else if (selectedCompany) {
+      setSearchType('route_short_name');
     } else {
       setSearchType('agency_name');
     }
-  }, [showBusLines, showNearbyStations, showStationSearch, showBusCompanies]); // Updated dependencies
+  }, [showBusLines, showNearbyStations, showStationSearch, showBusCompanies, selectedCompany]); // Updated dependencies
 
   useEffect(() => {
     const fetchBusData = async () => {
@@ -194,7 +197,7 @@ const MainPage = () => {
     if (showBusLines) return 'bus_lines';
     if (showNearbyStations) return 'nearby_stations';
     if (showStationSearch) return 'station';
-    if (showBusCompanies) return 'default';
+    if (showBusCompanies || selectedCompany) return 'company_lines';
     return 'default';
   };
 
@@ -204,6 +207,8 @@ const MainPage = () => {
     setShowNearbyStations(false);
     setShowStationSearch(false);
     setShowBusCompanies(true);
+    // Reset selected company to show all companies
+    setSelectedCompany(null);
   };
 
   return (
@@ -217,7 +222,7 @@ const MainPage = () => {
             onSubmit={handleSearch}
             searchType={searchType}
             onSearchTypeChange={handleSearchTypeChange}
-            placeholder={showBusLines ? 'Search by line number...' : showNearbyStations ? 'Search by station name...' : showStationSearch ? 'Search by station name...' : showBusCompanies ? 'Search by agency name...' : 'Search by agency name...'}
+            placeholder={showBusLines ? 'Search by line number...' : showNearbyStations ? 'Search by station name...' : showStationSearch ? 'Search by station name...' : (showBusCompanies || selectedCompany) ? 'Search by line number...' : 'Search by agency name...'}
             searchMode={getCurrentSearchMode()}
           />
         </div>
@@ -231,9 +236,9 @@ const MainPage = () => {
           </div>
           {/* Left: Results container */}
           <div className="mainpage-left">
-            {error ? (
-              <div className="results-error" style={{ color: 'red', padding: '1rem' }}>{error}</div>
-            ) : (
+          {error ? (
+            <div className="results-error" style={{ color: 'red', padding: '1rem' }}>{error}</div>
+          ) : (
               <ResultsDisplay
                 results={results}
                 loading={loading}
@@ -247,11 +252,13 @@ const MainPage = () => {
                 stationsLoading={stationsLoading}
                 searchType={searchType}
                 showBusCompanies={showBusCompanies}
+                selectedCompany={selectedCompany}
+                setSelectedCompany={setSelectedCompany}
               />
-            )}
-          </div>
+          )}
         </div>
       </div>
+    </div>
       <Footer />
     </>
   );

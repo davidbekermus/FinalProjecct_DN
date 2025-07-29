@@ -1,0 +1,376 @@
+.driver-route-manager-main {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 2rem 0;
+}
+
+.driver-route-manager-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.route-info-header {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.route-info-header h2 {
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  font-size: 1.8rem;
+}
+
+.route-info-header p {
+  margin: 0.25rem 0;
+  color: #666;
+}
+
+.driver-route-manager-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  min-height: 600px;
+}
+
+/* Left Side - Stops Panel */
+.stops-panel {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  height: fit-content;
+}
+
+.stops-panel h3 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 0.5rem;
+}
+
+.stops-list {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.stop-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+}
+
+.stop-item.current-stop {
+  border-color: #3498db;
+  background: #e3f2fd;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+.stop-number {
+  background: #3498db;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.current-stop .stop-number {
+  background: #e74c3c;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.stop-info {
+  flex: 1;
+}
+
+.stop-name {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.25rem;
+}
+
+.current-indicator {
+  font-size: 0.8rem;
+  color: #e74c3c;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Right Side - Controls Panel */
+.controls-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.navigation-controls {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+.navigation-controls h3 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  border-bottom: 2px solid #27ae60;
+  padding-bottom: 0.5rem;
+}
+
+.control-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.nav-btn {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.prev-btn {
+  background: #95a5a6;
+  color: white;
+}
+
+.prev-btn:hover:not(:disabled) {
+  background: #7f8c8d;
+}
+
+.next-btn {
+  background: #3498db;
+  color: white;
+}
+
+.next-btn:hover:not(:disabled) {
+  background: #2980b9;
+}
+
+.nav-btn:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.arrived-btn {
+  width: 100%;
+  padding: 1rem;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.arrived-btn:hover:not(:disabled) {
+  background: #229954;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+}
+
+.arrived-btn:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Status Panel */
+.status-panel {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  flex: 1;
+}
+
+.status-panel h3 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  border-bottom: 2px solid #e74c3c;
+  padding-bottom: 0.5rem;
+}
+
+.status-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.current-stop-info {
+  margin-bottom: 1.5rem;
+}
+
+.current-stop-info h4 {
+  color: #2c3e50;
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.current-stop-info p {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.stop-status {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.passenger-count {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #3498db;
+}
+
+.passenger-count .label {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.passenger-count .count {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #e74c3c;
+}
+
+.stop-decision {
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.decision {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.decision.should-stop {
+  background: #e8f5e8;
+  color: #27ae60;
+  border: 2px solid #27ae60;
+}
+
+.decision.no-stop {
+  background: #fff3cd;
+  color: #856404;
+  border: 2px solid #ffc107;
+}
+
+.decision .icon {
+  font-size: 1.3rem;
+}
+
+/* Loading and Error States */
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #7f8c8d;
+  font-style: italic;
+}
+
+.error {
+  text-align: center;
+  padding: 1rem;
+  color: #e74c3c;
+  background: #fdf2f2;
+  border-radius: 6px;
+  border: 1px solid #fecaca;
+}
+
+.no-stop-selected {
+  text-align: center;
+  padding: 2rem;
+  color: #7f8c8d;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .driver-route-manager-content {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .control-buttons {
+    flex-direction: column;
+  }
+  
+  .stops-list {
+    max-height: 300px;
+  }
+  
+  .driver-route-manager-container {
+    padding: 0 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .driver-route-manager-main {
+    padding: 1rem 0;
+  }
+  
+  .route-info-header {
+    padding: 1rem;
+  }
+  
+  .stops-panel,
+  .navigation-controls,
+  .status-panel {
+    padding: 1rem;
+  }
+  
+  .stop-item {
+    padding: 0.75rem;
+  }
+  
+  .nav-btn,
+  .arrived-btn {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+} 

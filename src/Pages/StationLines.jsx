@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
 import "../Css/StationLines.css";
-import axios from "axios";
+import { api } from "../utils/api";
 
 const StationLines = () => {
   const location = useLocation();
@@ -14,13 +14,15 @@ const StationLines = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // קבלת נתוני התחנה מה-state או מה-URL params
     if (location.state && location.state.station) {
-      setStation(location.state.station);
-      fetchStationLines(location.state.station);
+      const stationData = location.state.station;
+      console.log("Station from location.state:", stationData);
+
+      setStation(stationData);
+      fetchStationLines(stationData);
     } else {
-      // אם אין נתונים, חזור לעמוד הקודם
-      setError("לא נמצאו נתוני תחנה");
+      console.warn("No station found in location.state");
+      setError("No station data found");
     }
   }, [location]);
 
@@ -29,117 +31,82 @@ const StationLines = () => {
     setError("");
     setLines([]);
 
-    console.log("Starting to fetch lines for station:", stationData);
-    console.log("Station ID:", stationData.id, "Type:", typeof stationData.id);
+    const rawId = stationData.id;
+    const stationId = Number(rawId);
+    console.log("Station ID:", rawId, "Parsed:", stationId);
 
-    // בדיקת תקינות של station ID
-    if (
-      !stationData.id ||
-      stationData.id === undefined ||
-      stationData.id === null
-    ) {
-      console.error("Invalid station ID:", stationData.id);
-      setError("מזהה תחנה לא תקין");
+    if (!stationId || isNaN(stationId)) {
+      setError("Invalid station ID");
       setLoading(false);
       return;
     }
 
     try {
-      // שליפת קווים מהשרת המקומי לפי מזהה התחנה
-      const localServerUrl = `http://localhost:3000/routes/station/${stationData.id}`;
-      console.log("Fetching routes from local server:", localServerUrl);
-
-      const response = await axios.get(localServerUrl);
-      console.log("Local server response status:", response.status);
-
+      const response = await api.get(`/routes/station/${stationId}`);
       const data = response.data;
-      console.log("Routes data from local server:", data);
+
+      console.log("Raw data:", data);
+
+      console.log("Received routes:", data.routes.length);
 
       if (!data.routes || data.routes.length === 0) {
-        setLines([]);
-        setError("לא נמצאו קווים לתחנה זו");
+        setError("No lines found for this station");
         setLoading(false);
         return;
       }
 
-      // שמירת מידע על מספר הקווים המקוריים
-      const originalCount = data.originalCount || data.routes.length;
-      console.log(
-        `Original routes: ${originalCount}, Total shown: ${data.routes.length}`
-      );
+      const processedLines = data.routes.map((route) => {
+        // The busLineId field contains the populated bus line object
+        const busLineData = route.busLineId;
+        return {
+          id: route._id,
+          _id: busLineData?._id || route._id, // Use MongoDB ObjectId from busLine
+          route_short_name: busLineData?.route_short_name || "Unknown",
+          route_long_name: busLineData?.route_long_name || "Unknown",
+          agency_name: busLineData?.agency_name || "Unknown",
+          gtfs_route_id: busLineData?.id || route._id,
+          routeDescription: busLineData?.route_desc || `Route serving ${route.stations?.length || 0} stations`,
+          busLineId: busLineData,
+        };
+      });
 
-      // עיבוד הנתונים - כל route כבר מכיל את פרטי הקו (busLineId populated)
-      const processedLines = data.routes.map((route) => ({
-        id: route._id,
-        route_short_name: route.busLineId?.route_short_name || "לא ידוע",
-        route_long_name: route.busLineId?.route_long_name || "לא ידוע",
-        agency_name: route.busLineId?.agency_name || "לא ידוע",
-        gtfs_route_id: route.busLineId?.gtfs_route_id || route._id,
-        routeDescription:
-          route.routeDescription ||
-          route.busLineId?.route_desc ||
-          "מסלול לא זמין", // מידע על המסלול
-        busLineId: route.busLineId,
-      }));
-
-      console.log("Processed lines:", processedLines);
-
-      // מיון לפי מספר קו
       const sortedLines = processedLines.sort((a, b) => {
         const aNum = parseInt(a.route_short_name) || 999;
         const bNum = parseInt(b.route_short_name) || 999;
         return aNum - bNum;
       });
 
-      console.log("Final sorted lines:", sortedLines);
+      console.log("Full lines object for station:", sortedLines);
       setLines(sortedLines);
     } catch (err) {
-      console.error("Error fetching station lines:", err);
-      setError(`שגיאה בשליפת הקווים: ${err.message}`);
-      setLines([]);
+      console.error("Error fetching lines:", err);
+      setError(`Error fetching lines: ${err.message}`);
     }
 
     setLoading(false);
   };
 
-  const handleBack = () => {
-    navigate(-1); // חזור לעמוד הקודם
-  };
+  const handleBack = () => navigate(-1);
 
   const handleLineClick = (line) => {
-    // ניווט לעמוד פרטי הקו עם הנתונים הנכונים
-    console.log("Navigating to bus line route with:", line);
-    navigate(`/bus-line-route/${line.gtfs_route_id}`, {
+    console.log("Clicked line:", line);
+    navigate(`/bus-line-route/${line._id}`, {
       state: {
         routeShortName: line.route_short_name,
         routeLongName: line.route_long_name,
         agencyName: line.agency_name,
-        line: line, // שמירה על הנתונים המקוריים
+        line: line,
       },
     });
   };
 
-  if (!station && !error) {
-    return (
-      <>
-        <Header title="קווים בתחנה" />
-        <main className="station-lines-main">
-          <div className="station-lines-container">
-            <div className="loading-message">טוען...</div>
-          </div>
-        </main>
-        <Footer />
-      </>
-    );
-  }
-
   return (
     <>
-      <Header title="קווים בתחנה" />
+      <Header title="Station Lines" />
       <main className="station-lines-main">
         <div className="station-lines-container">
           <button className="back-btn" onClick={handleBack}>
-            ← חזור
+            ← Back
           </button>
 
           {station && (
@@ -148,48 +115,24 @@ const StationLines = () => {
               <div className="station-details">
                 <h2 className="station-name">{station.name}</h2>
                 <p className="station-city">{station.city}</p>
-                {station.code && (
-                  <p className="station-code">קוד תחנה: {station.code}</p>
-                )}
-                {station.distance && (
-                  <p className="station-distance">
-                    מרחק: {station.distance.toFixed(1)} ק"מ
-                  </p>
-                )}
+                {station.code && <p className="station-code">Station Code: {station.code}</p>}
+                {station.distance && <p className="station-distance">Distance: {station.distance.toFixed(1)} km</p>}
               </div>
             </div>
           )}
 
           <div className="lines-section">
-            <h3 className="lines-title">
-              קווים המגיעים לתחנה ({lines.length})
-            </h3>
-            {lines.length >= 10 && (
-              <p
-                style={{
-                  textAlign: "center",
-                  fontSize: "0.9rem",
-                  color: "#6b7280",
-                  marginBottom: "1rem",
-                }}
-              >
-                מוצגים 10 קווים (כולל קווים נוספים להשלמה במידת הצורך)
-              </p>
-            )}
+            <h3 className="lines-title">Lines serving this station ({lines.length})</h3>
 
-            {loading && <div className="loading-message">טוען קווים...</div>}
-
+            {loading && <div className="loading-message">Loading lines...</div>}
             {error && <div className="error-message">{error}</div>}
-
-            {!loading && !error && lines.length === 0 && (
-              <div className="empty-message">לא נמצאו קווים לתחנה זו</div>
-            )}
+            {!loading && !error && lines.length === 0 && <div className="empty-message">No lines found</div>}
 
             {!loading && lines.length > 0 && (
               <div className="lines-grid">
                 {lines.map((line, index) => (
                   <div
-                    key={line.gtfs_route_id || index}
+                    key={line._id || index}
                     className="line-card"
                     onClick={() => handleLineClick(line)}
                   >
