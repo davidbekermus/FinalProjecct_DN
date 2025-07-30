@@ -2,6 +2,7 @@
   --gradient-start: #1e3a8a; /* deep blue */
   --gradient-end: #3b82f6; /* lighter blue */
   --text-light: #ffffff;
+  --text-dark-blue: #003366; /* dark blue for non-transparent text */
   --hover-accent: #bfdbfe;
 }
 
@@ -10,90 +11,138 @@
     to right,
     var(--gradient-start),
     var(--gradient-end)
-  );
+  ); /* Default blue background */
   padding: 1rem 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   position: fixed;
   top: 0;
   width: 100%;
-  z-index: 1000;
+  z-index: 1000; /* Ensure it's on top */
   backdrop-filter: blur(8px);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
-.header-overlay {
-  position: absolute;
+.modern-header.transparent {
+  background: none; /* Transparent background for home page */
+  box-shadow: none; /* No shadow for transparent header */
+}
+
+.modern-header.transparent .site-title,
+.modern-header.transparent .nav-link,
+.modern-header.transparent .nav-link[href="/Login"],
+.modern-header.transparent .nav-link[href="/SignUp"],
+.modern-header.transparent .nav-link[href="/plan-journey"],
+.modern-header.transparent .nav-link[href="/UiDriver"],
+.modern-header.transparent .nav-link[href="/AdminPage"],
+.modern-header.transparent .nav-link[style*="cursor: default"],
+.modern-header.transparent .nav-link[onclick*="handleSignOut"],
+.modern-header.transparent .transit-info-link {
+  color: #fff; /* White text for transparent header */
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.5); /* Shadow for contrast */
+}
+
+/* Default (non-transparent) header text/links */
+.modern-header .site-title,
+.modern-header .nav-link,
+.modern-header .nav-link[href="/Login"],
+.modern-header .nav-link[href="/SignUp"],
+.modern-header .nav-link[href="/plan-journey"],
+.modern-header .nav-link[href="/UiDriver"],
+.modern-header .nav-link[href="/AdminPage"],
+.modern-header .nav-link[style*="cursor: default"],
+.modern-header .nav-link[onclick*="handleSignOut"],
+.modern-header .transit-info-link {
+  color: var(--text-light); /* Original light text for default header */
+  text-shadow: none;
+}
+
+.modern-header.transparent .nav-link:hover {
+  color: #ddd; /* Lighter hover for transparent header */
+  opacity: 1;
+}
+
+.modern-header .nav-link:hover {
+  color: var(--hover-accent); /* Original hover for default header */
+  opacity: 1;
+}
+
+/* Ensure the header overlay is working correctly with the new structure */
+.header-overlay .modern-header {
+  position: absolute; /* Header is absolute within its overlay div */
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
-  background-color: white;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  z-index: 1;
+  background: none; /* Ensure no background when overlay */
+  box-shadow: none;
+  z-index: auto;
 }
 
+/* פריסה פנימית */
 .modern-header-container {
   width: 100%;
   display: flex;
   align-items: center;
+  justify-content: space-between; /* Align logo left, nav right */
   position: relative;
   z-index: 2;
-  padding: 0 2rem;
+  padding: 0 1rem;
   min-width: 0;
   overflow-x: visible;
+  flex-wrap: wrap;
+}
+
+.flex-spacer {
+  flex-grow: 1; /* Pushes nav links to the right */
+  min-width: 1rem;
 }
 
 .logo-title-group {
   display: flex;
   align-items: center;
+  margin-right: 0; /* No extra margin needed here as spacer handles spacing */
   margin-left: 0;
 }
 
 .logo-link {
   display: inline-block;
-  margin-left: 0;
 }
 
 .logo-image {
-  height: 80px;
+  height: 60px;
   width: auto;
   margin-right: 1rem;
 }
 
 .site-title {
-  font-size: 1.75rem;
+  font-size: 1.6rem;
   font-weight: 600;
   color: var(--text-light);
   margin: 0;
-  transition: opacity 0.3s ease;
-}
-
-.flex-spacer {
-  flex-grow: 1;
 }
 
 .nav-links {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
   align-items: center;
   position: relative;
   transition: opacity 0.3s ease;
-  padding-right: 1rem;
-  flex-wrap: nowrap;
-  white-space: nowrap;
-  justify-content: flex-end;
+  padding-right: 0;
+  flex-wrap: wrap;
+  white-space: normal;
+  justify-content: flex-end; /* Align nav items to the right within their container */
   min-width: 0;
   overflow-x: visible;
+  margin-right: 2rem; /* Pull links slightly left from the right edge, increased */
 }
 
 .nav-link {
   text-decoration: none;
   color: #fff;
   font-weight: 700;
-  font-size: 1rem;
-  font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+  font-size: 0.95rem; /* Slightly reduced font size */
+  font-family: "Segoe UI", "Roboto", "Arial", sans-serif;
   transition: color 0.3s ease;
-  padding: 0.5rem 1rem;
+  padding: 0.3rem 0.8rem; /* Reduced padding */
   border-radius: 0;
   background: none;
   border: none;
@@ -103,99 +152,11 @@
 }
 
 .nav-link:hover {
-  color: #fff;
-  opacity: 0.7;
-}
-
-/* Remove all special color overrides for links */
-.nav-link[href="/Login"],
-.nav-link[href="/SignUp"],
-.nav-link[href="/plan-journey"],
-.nav-link[href="/UiDriver"],
-.nav-link[href="/AdminPage"],
-.nav-link[style*="cursor: default"],
-.nav-link[onclick*="handleSignOut"] {
-  color: #fff;
-  font-weight: 700;
-  font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
-}
-
-.nav-link[onclick*="handleSignOut"] {
-  white-space: nowrap;
-}
-
-.transit-info-dropdown {
-  position: relative;
-  display: inline-block;
-  padding: 0.5rem;
-}
-
-.transit-info-link {
-  position: relative;
-  cursor: pointer;
-  display: inline-block;
-  color: var(--text-light);
-  transition: color 0.3s ease;
-}
-
-.transit-info-link::after {
-  content: "\25BC"; /* Down arrow symbol */
-  margin-left: 0.5rem;
-  font-size: 0.8rem;
-}
-
-/* Updated dropdown content styling */
-.dropdown-content {
-  visibility: hidden;
-  opacity: 0;
-  position: absolute;
-  background-color: white;
-  min-width: 160px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  z-index: 9999;
-  right: 0;
-  border-radius: 4px;
-  padding: 0.5rem 0;
-  margin-top: 0.5rem;
-  top: 100%;
-  left: auto;
-  transform: translateY(10px);
-  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
-}
-
-.transit-info-dropdown:hover .dropdown-content {
-  visibility: visible;
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.transit-info-link:hover {
   color: var(--hover-accent);
 }
 
-.dropdown-item-text {
-  display: block;
-  padding: 0.5rem 1rem;
-  color: #2c3e50;
-  text-decoration: none;
-  transition: background-color 0.3s ease;
-}
-
-.dropdown-item-text:hover {
-  background-color: #f5f5f5;
-  color: #34495e;
-}
-
-.dropdown-link {
-  display: block;
-  padding: 0.5rem 1rem;
-  color: #2c3e50;
-  text-decoration: none;
-  transition: background-color 0.3s ease;
-  white-space: nowrap;
-}
-
-.dropdown-link:hover {
-  background-color: #f5f5f5;
-  color: #34495e;
+/* Remove specific spacer styles that are no longer needed */
+.left-flex-spacer,
+.right-flex-spacer {
+  display: none; /* Hide the old spacer classes */
 }
