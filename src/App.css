@@ -345,7 +345,8 @@
   margin-top: 0.25rem;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   width: 100%;
@@ -359,9 +360,34 @@ html, body {
   overflow-x: hidden;
 }
 
-.home-main, .transport-main {
+.mainpage-layout,
+.home-main,
+.signin-main,
+.signup-main {
+  margin: 0; /* Remove auto margin */
+  max-width: none; /* Remove max-width */
+  width: 100vw; /* Ensure full width */
+}
+
+.transport-main {
   margin: 0 auto;
   max-width: 1200px;
   width: 100%;
   box-sizing: border-box;
+}
+
+.signin-main,
+.signup-main,
+.transport-main {
+  padding: 0; /* Remove padding if it causes gaps */
+}
+
+.signin-container,
+.signup-container,
+.transport-container {
+  max-width: none; /* Remove max-width from inner containers too if they are present */
+  width: 100%; /* Ensure inner containers also take full width */
+  border-radius: 0; /* Remove border-radius to be full width, if desired */
+  box-shadow: none; /* Remove shadows if going for edge-to-edge */
+  padding: 0; /* Remove padding to be truly edge-to-edge */
 }

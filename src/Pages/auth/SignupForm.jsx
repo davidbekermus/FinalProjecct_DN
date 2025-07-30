@@ -40,12 +40,17 @@ const SignupForm = () => {
     }
     try {
       setIsLoading(true);
-      const signupResponse = await axios.post("http://localhost:3000/auth/signup", formData);
-      
+      const signupResponse = await axios.post(
+        "http://localhost:3000/auth/signup",
+        formData
+      );
+
       // Check if this is a driver signup
       if (formData.role === "driver") {
         setError("");
-        alert("Driver account created successfully! Please wait for admin approval before logging in.");
+        alert(
+          "Driver account created successfully! Please wait for admin approval before logging in."
+        );
         nav("/Login");
         return;
       }
@@ -54,7 +59,7 @@ const SignupForm = () => {
       // Automatically log the user in after signup (only for non-drivers)
       const loginRes = await axios.post("http://localhost:3000/auth/login", {
         email: formData.email,
-        password: formData.password
+        password: formData.password,
       });
       if (loginRes.data?.token && loginRes.data?.user) {
         localStorage.setItem("token", loginRes.data.token);

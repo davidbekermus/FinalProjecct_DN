@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "../Css/Header.css";
 import { AuthContext } from "../App";
 
-const Header = ({ title }) => {
+const Header = ({ title, transparent }) => {
   const [opacity, setOpacity] = useState(1);
   const [lastScrollTop, setLastScrollTop] = useState(0);
   const { user, setUser, setToken } = useContext(AuthContext);
@@ -37,7 +37,10 @@ const Header = ({ title }) => {
   };
 
   return (
-    <header className="modern-header" style={{ opacity }}>
+    <header
+      className={`modern-header ${transparent ? "transparent" : ""}`}
+      style={{ opacity }}
+    >
       <div className="modern-header-container">
         {/* Left side: Logo + title */}
         <div className="logo-title-group">
@@ -51,7 +54,7 @@ const Header = ({ title }) => {
           <h1 className="site-title">{title}</h1>
         </div>
 
-        {/* Spacer to push nav links inward */}
+        {/* Spacer to push nav links to right */}
         <div className="flex-spacer"></div>
 
         {/* Nav links */}
@@ -68,7 +71,10 @@ const Header = ({ title }) => {
           )}
           {user ? (
             <>
-              <span className="nav-link" style={{ cursor: "default", fontWeight: 600 }}>
+              <span
+                className="nav-link"
+                style={{ cursor: "default", fontWeight: 600 }}
+              >
                 Hello {user.name}
               </span>
               {user.role === "admin" && (
@@ -76,7 +82,15 @@ const Header = ({ title }) => {
                   Admin
                 </Link>
               )}
-              <button className="nav-link" onClick={handleSignOut} style={{ background: "none", border: "none", cursor: "pointer" }}>
+              <button
+                className="nav-link"
+                onClick={handleSignOut}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
                 Sign Out
               </button>
             </>
@@ -90,7 +104,6 @@ const Header = ({ title }) => {
               </Link>
             </>
           )}
-
         </nav>
       </div>
     </header>

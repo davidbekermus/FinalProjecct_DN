@@ -27,9 +27,9 @@
 
 .mainpage-left {
   flex: 3;
-  background: rgba(219,234,254,0.7);
+  background: rgba(219, 234, 254, 0.7);
   border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(59,130,246,0.10);
+  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.1);
   padding: 2rem;
   display: flex;
   align-items: flex-start;
@@ -45,7 +45,7 @@
   gap: 1.5rem;
   background: linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%);
   border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(59,130,246,0.08);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
   padding: 1rem 0.5rem;
   align-items: stretch;
   height: 100%;
@@ -174,16 +174,17 @@
   justify-content: center;
 }
 
-.search-bar__button:hover, .search-bar__button:focus {
+.search-bar__button:hover,
+.search-bar__button:focus {
   background: #2563eb;
-  box-shadow: 0 2px 8px rgba(59,130,246,0.10);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
   transform: translateY(-2px) scale(1.03);
 }
 
 .filter-component {
   background: #fff;
   border-radius: 10px;
-  box-shadow: 0 1px 6px rgba(59,130,246,0.08);
+  box-shadow: 0 1px 6px rgba(59, 130, 246, 0.08);
   padding: 1.5rem;
   font-size: 1.1rem;
   text-align: center;
@@ -196,7 +197,7 @@
 .filter-component:hover {
   background: #dbeafe;
   color: #1e40af;
-  box-shadow: 0 4px 16px rgba(59,130,246,0.12);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.12);
 }
 
 .filter-component-1 {
@@ -241,10 +242,10 @@
 
 .results-display {
   width: 100%;
-  background: rgba(191,219,254,0.4);
+  background: rgba(191, 219, 254, 0.4);
   border-radius: 12px;
   padding: 1.5rem 1rem;
-  box-shadow: 0 2px 8px rgba(59,130,246,0.06);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.06);
 }
 
 /* Company lines styles */
@@ -256,13 +257,13 @@
   text-align: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .company-card:hover {
   background: #f0f0f0;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(59,130,246,0.15);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
 }
 
 .company-lines-list {
@@ -616,4 +617,4 @@
   border-radius: 8px;
   padding: 1rem;
   text-align: center;
-} 
+}
