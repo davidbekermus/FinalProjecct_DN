@@ -38,9 +38,11 @@
   align-items: center;
   position: relative;
   z-index: 2;
-  padding: 0 2rem;
+  padding: 0 2rem 0 2rem;
   min-width: 0;
   overflow-x: visible;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .logo-title-group {
@@ -70,6 +72,7 @@
 
 .flex-spacer {
   flex-grow: 1;
+  margin-right: 1rem;
 }
 
 .nav-links {
@@ -84,6 +87,7 @@
   justify-content: flex-end;
   min-width: 0;
   overflow-x: visible;
+  margin-right: 2rem;
 }
 
 .nav-link {

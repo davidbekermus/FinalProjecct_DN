@@ -12,6 +12,7 @@ import StationLines from "./Pages/passneger/StationLines";
 import RouteCounter from "./Pages/RouteCounter";
 import axios from "axios";
 import MainPage from './Pages/passneger/planAJourney/MainPage';
+import NotFound from './Pages/NotFound';
 import { api } from "./utils/api";
 
 const routes = [
@@ -25,6 +26,7 @@ const routes = [
   { path: "/plan-journey", element: <MainPage />, public: true, allowedRoles: ["passenger", "driver", "admin"] },
   { path: "/station-lines", element: <StationLines />, public: true, allowedRoles: ["passenger", "driver", "admin"] },
   { path: "/RouteCounter", element: <RouteCounter />, public: true, allowedRoles: ["passenger", "driver", "admin"] },
+  { path: "/*", element: <NotFound />, public: true, allowedRoles: ["passenger", "driver", "admin"] },
 ];
 
 // Create AuthContext

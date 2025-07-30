@@ -8,13 +8,15 @@
 }
 
 .signin-main {
-  min-height: 100vh;
+  min-height: calc(100vh - 200px); /* Account for header and footer */
   background: linear-gradient(135deg, var(--blue-start), var(--blue-end));
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-top: 6rem; /* for header space */
-  padding-bottom: 3rem;
+  padding: 120px 0 60px 0; /* Top padding for header, bottom for footer */
+  box-sizing: border-box;
+  margin: 0;
+  width: 100%;
 }
 
 .signin-container {
@@ -26,6 +28,7 @@
   max-width: 400px;
   width: 90%;
   text-align: center;
+  margin: 0 auto;
 }
 
 .signin-title {
@@ -39,6 +42,7 @@
   flex-direction: column;
   margin-bottom: 1.5rem;
   text-align: left;
+  width: 100%;
 }
 
 .input-group label {
@@ -48,11 +52,13 @@
 }
 
 .signin-input {
+  width: 100%;
   padding: 0.75rem 1rem;
   border-radius: 12px;
   border: 1px solid #ccc;
   font-size: 1rem;
   transition: border-color 0.3s ease;
+  box-sizing: border-box;
 }
 
 .signin-input:focus {
