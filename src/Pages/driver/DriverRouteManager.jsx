@@ -16,6 +16,7 @@ const DriverRouteManager = () => {
   const [error, setError] = useState(null);
   const [currentStopData, setCurrentStopData] = useState(null);
   const [loadingStopData, setLoadingStopData] = useState(false);
+  const [selectedDirection, setSelectedDirection] = useState("1"); // Default to Direction 1
 
   // Fetch stops for the selected route
   useEffect(() => {
@@ -71,7 +72,8 @@ const DriverRouteManager = () => {
         const response = await api.get('/route-counter/station', {
           params: {
             stationId: currentStop.id,
-            route_mkt: selectedRoute.route_mkt || selectedRoute.id
+            route_mkt: selectedRoute.route_mkt || selectedRoute.id,
+            routeDirection: selectedDirection
           }
         });
         
@@ -90,7 +92,7 @@ const DriverRouteManager = () => {
     };
 
     fetchCurrentStopData();
-  }, [currentStopIndex, stops, selectedRoute]);
+  }, [currentStopIndex, stops, selectedRoute, selectedDirection]);
 
   const handleNextStop = () => {
     if (currentStopIndex < stops.length - 1) {
@@ -138,6 +140,20 @@ const DriverRouteManager = () => {
             <h2>Route {selectedRoute.route_short_name}</h2>
             <p><strong>Company:</strong> {selectedRoute.agency_name}</p>
             <p><strong>Route:</strong> {selectedRoute.route_long_name}</p>
+            <div className="direction-selector">
+              <label htmlFor="direction-select">
+                <strong>Direction:</strong>
+              </label>
+              <select
+                id="direction-select"
+                value={selectedDirection}
+                onChange={(e) => setSelectedDirection(e.target.value)}
+                className="direction-select"
+              >
+                <option value="1">Direction 1 (Default)</option>
+                <option value="2">Direction 2 (Alternative)</option>
+              </select>
+            </div>
           </div>
 
           <div className="driver-route-manager-content">
@@ -206,6 +222,12 @@ const DriverRouteManager = () => {
                     <div className="current-stop-info">
                       <h4>{getCurrentStop().name}</h4>
                       <p>Stop #{currentStopIndex + 1} of {stops.length}</p>
+                      {selectedDirection && (
+                        <div className="direction-indicator">
+                          <span className="direction-label">Direction:</span>
+                          <span className="direction-value">🚌 Direction {selectedDirection}</span>
+                        </div>
+                      )}
                     </div>
                     
                     {loadingStopData ? (

@@ -140,7 +140,7 @@ const UiDriver = () => {
                           <h4>Route {route.route_short_name}</h4>
                           <p><strong>Company:</strong> {route.agency_name}</p>
                           <p><strong>Route:</strong> {route.route_long_name}</p>
-                          <p><strong>Direction:</strong> {route.route_direction}</p>
+
                           <p><strong>Type:</strong> {route.route_type}</p>
                         </div>
                         <button 

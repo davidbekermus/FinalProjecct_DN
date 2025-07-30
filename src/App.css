@@ -363,11 +363,16 @@ body {
 .mainpage-layout,
 .home-main,
 .signin-main,
-.signup-main,
-.transport-main {
+.signup-main {
   margin: 0; /* Remove auto margin */
   max-width: none; /* Remove max-width */
   width: 100vw; /* Ensure full width */
+}
+
+.transport-main {
+  margin: 0 auto;
+  max-width: 1200px;
+  width: 100%;
   box-sizing: border-box;
 }
 

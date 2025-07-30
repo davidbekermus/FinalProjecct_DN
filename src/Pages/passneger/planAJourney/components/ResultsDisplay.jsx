@@ -50,7 +50,8 @@ const ResultsDisplay = ({
   searchType,
   showBusCompanies,
   selectedCompany,
-  setSelectedCompany
+  setSelectedCompany,
+  updateFilterInURL
 }) => {
   const navigate = useNavigate();
   
@@ -101,6 +102,7 @@ const ResultsDisplay = ({
   // Handle company card click
   const handleCompanyClick = async (company) => {
     setSelectedCompany(company);
+    updateFilterInURL('company_lines', company.agency_name);
     setCompanyLinesLoading(true);
     setCompanyLinesError(null); // Reset error state
     
@@ -144,6 +146,7 @@ const ResultsDisplay = ({
     setSelectedCompany(null);
     setCompanyLines([]);
     setCompanyLinesError(null);
+    updateFilterInURL('company_lines');
   };
 
   // Handle line click - navigate to BusLineRoute
@@ -154,7 +157,8 @@ const ResultsDisplay = ({
         state: {
           routeShortName: line.route_short_name,
           routeLongName: line.route_long_name,
-          agencyName: line.agency_name
+          agencyName: line.agency_name,
+          route_mkt: line.route_mkt
         }
       });
     } else {
@@ -194,37 +198,42 @@ const ResultsDisplay = ({
             return (station.id || '').toString().includes(searchTerm);
           case 'city_name':
             return (station.city || '').toLowerCase().includes(searchLower);
-          case 'station_code':
-            return (station.code || '').toString().includes(searchTerm);
           case 'station_name':
           default:
             return (station.name || '').toLowerCase().includes(searchLower) ||
-                   (station.city || '').toLowerCase().includes(searchLower) ||
-                   (station.code || '').toString().includes(searchTerm);
+                   (station.city || '').toLowerCase().includes(searchLower);
         }
       });
     }
     
-    // Sort stations by city name starting from א (Alef)
+    // Sort stations based on search filter
     filteredStations = filteredStations.sort((a, b) => {
-      const cityA = (a.city || '').toLowerCase();
-      const cityB = (b.city || '').toLowerCase();
-      
-      // Hebrew characters come after English characters in Unicode
-      // So we need to handle Hebrew sorting specially
-      const hebrewA = cityA.match(/[\u0590-\u05FF]/); // Hebrew Unicode range
-      const hebrewB = cityB.match(/[\u0590-\u05FF]/);
-      
-      // If both are Hebrew or both are not Hebrew, sort normally
-      if ((hebrewA && hebrewB) || (!hebrewA && !hebrewB)) {
-        return cityA.localeCompare(cityB, 'he'); // Use Hebrew locale
+      switch (searchType) {
+        case 'station_name':
+          return (a.name || '').localeCompare(b.name || '', 'he');
+        case 'station_id':
+          return (a.id || 0) - (b.id || 0);
+        case 'city_name':
+        default:
+          const cityA = (a.city || '').toLowerCase();
+          const cityB = (b.city || '').toLowerCase();
+          
+          // Hebrew characters come after English characters in Unicode
+          // So we need to handle Hebrew sorting specially
+          const hebrewA = cityA.match(/[\u0590-\u05FF]/); // Hebrew Unicode range
+          const hebrewB = cityB.match(/[\u0590-\u05FF]/);
+          
+          // If both are Hebrew or both are not Hebrew, sort normally
+          if ((hebrewA && hebrewB) || (!hebrewA && !hebrewB)) {
+            return cityA.localeCompare(cityB, 'he'); // Use Hebrew locale
+          }
+          
+          // Hebrew cities come first
+          if (hebrewA && !hebrewB) return -1;
+          if (!hebrewA && hebrewB) return 1;
+          
+          return cityA.localeCompare(cityB, 'he');
       }
-      
-      // Hebrew cities come first
-      if (hebrewA && !hebrewB) return -1;
-      if (!hebrewA && hebrewB) return 1;
-      
-      return cityA.localeCompare(cityB, 'he');
     });
     
     // Paginate stations
@@ -240,27 +249,22 @@ const ResultsDisplay = ({
           <div className="results-empty-placeholder">No stations found</div>
         ) : (
           <>
-            <div className="stations-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+            <div className="stations-grid">
               {paginatedStations.map((station, idx) => (
                 <div 
                   key={station.id || idx} 
-                  className="station-card" 
-                  style={{ 
-                    border: '1px solid #e5e7eb', 
-                    borderRadius: '8px', 
-                    padding: '1rem', 
-                    background: '#fff',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}
+                  className="station-card"
                   onClick={() => handleStationClick(station)}
-                  onMouseEnter={(e) => e.target.style.boxShadow = '0 4px 12px rgba(59,130,246,0.15)'}
-                  onMouseLeave={(e) => e.target.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)'}
                 >
-                  <strong>{station.name}</strong><br />
-                  <span style={{ color: '#6b7280', fontSize: '0.9em' }}>{station.city}</span><br />
-                  <span style={{ color: '#3b82f6', fontSize: '0.85em' }}>Code: {station.code}</span>
+                  <div className="station-name">
+                    🚉 {station.name}
+                  </div>
+                  <div className="station-city">
+                    🏙️ {station.city}
+                  </div>
+                  <div className="station-code">
+                    Code: {station.code}
+                  </div>
                 </div>
               ))}
             </div>
@@ -305,8 +309,6 @@ const ResultsDisplay = ({
             return (station.id || '').toString().includes(searchTerm);
           case 'city_name':
             return (station.city || '').toLowerCase().includes(searchLower);
-          case 'station_code':
-            return (station.code || '').toString().includes(searchTerm);
           case 'station_name':
           default:
             return (station.name || '').toLowerCase().includes(searchLower) ||
@@ -314,24 +316,44 @@ const ResultsDisplay = ({
         }
       });
     }
+    
+    // Sort nearby stations based on search filter
+    filteredStations = filteredStations.sort((a, b) => {
+      switch (searchType) {
+        case 'station_name':
+          return (a.name || '').localeCompare(b.name || '', 'he');
+        case 'station_id':
+          return (a.id || 0) - (b.id || 0);
+        case 'city_name':
+        default:
+          return (a.city || '').localeCompare(b.city || '', 'he');
+      }
+    });
+    
     return (
       <div className="results-display">
         {filteredStations.length === 0 ? (
           <div className="results-empty-placeholder">No nearby stations found</div>
         ) : (
-          <ul className="nearby-stations-list">
+          <div className="nearby-stations-grid">
             {filteredStations.map((station, idx) => (
-              <li 
+              <div 
                 key={station.id || idx} 
-                className="nearby-station-item"
+                className="nearby-station-card"
                 onClick={() => handleStationClick(station)}
-                style={{ cursor: 'pointer' }}
               >
-                <strong>{station.name}</strong> ({station.city})<br />
-                <span style={{ color: '#2563eb', fontSize: '0.95em' }}>{station.distance.toFixed(2)} km away</span>
-              </li>
+                <div className="station-name">
+                  🚉 {station.name}
+                </div>
+                <div className="station-city">
+                  🏙️ {station.city}
+                </div>
+                <div className="station-distance">
+                  📍 {station.distance.toFixed(2)} km away
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     );
@@ -354,11 +376,35 @@ const ResultsDisplay = ({
           case 'agency_name':
             return (line.agency_name || '').toLowerCase().includes(searchLower);
           case 'route_short_name':
+            return (line.route_short_name || '').toLowerCase().includes(searchLower);
+          case 'route_direction':
+            return (line.route_direction || '').toLowerCase().includes(searchLower);
           default:
             return (line.route_short_name || '').toLowerCase().includes(searchLower);
         }
       });
     }
+    
+    // Sort bus lines based on search filter
+    filteredBusLines = filteredBusLines.sort((a, b) => {
+      switch (searchType) {
+        case 'agency_name':
+          return (a.agency_name || '').localeCompare(b.agency_name || '', 'he');
+        case 'route_short_name':
+          // Sort numerically for route numbers
+          const aNum = parseInt(a.route_short_name) || 0;
+          const bNum = parseInt(b.route_short_name) || 0;
+          return aNum - bNum;
+        case 'route_direction':
+          return (a.route_direction || '').localeCompare(b.route_direction || '', 'he');
+        default:
+          // Default to route number sorting
+          const aNumDefault = parseInt(a.route_short_name) || 0;
+          const bNumDefault = parseInt(b.route_short_name) || 0;
+          return aNumDefault - bNumDefault;
+      }
+    });
+    
     const paginatedLines = filteredBusLines.slice((page - 1) * pageSize, page * pageSize);
     const grouped = groupByAgency(paginatedLines);
     const totalPages = Math.ceil(filteredBusLines.length / pageSize);
@@ -372,18 +418,37 @@ const ResultsDisplay = ({
             {Object.entries(grouped).map(([agency, lines]) => (
               <div key={agency} className="bus-lines-agency-group">
                 <h3 className="bus-lines-agency-header">{agency}</h3>
-                <ul className="bus-lines-list">
-                  {lines.map((line, idx) => (
-                    <li 
-                      key={line._id || idx} 
-                      className="bus-line-item"
-                      onClick={() => handleLineClick(line)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      {line.route_short_name} - {line.route_long_name}
-                    </li>
-                  ))}
-                </ul>
+                <div className="bus-lines-grid">
+                  {lines.map((line, idx) => {
+                    // Extract city information from route_long_name
+                    const cityMatch = line.route_long_name?.match(/-([^-]+)-/);
+                    const cityName = cityMatch ? cityMatch[1].trim() : '';
+                    
+                    return (
+                      <div 
+                        key={line._id || idx} 
+                        className="company-line-card"
+                        onClick={() => handleLineClick(line)}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <div className="line-number">
+                          Line {line.route_short_name}
+                        </div>
+                        {line.route_long_name && (
+                          <div className="line-description">
+                            {line.route_long_name}
+                          </div>
+                        )}
+                        {cityName && (
+                          <div className="line-city">
+                            🏙️ {cityName}
+                          </div>
+                        )}
+
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             ))}
           </div>
@@ -453,12 +518,12 @@ const ResultsDisplay = ({
           <div className="company-header">
             <button 
               onClick={handleBackToCompanies}
-              className="back-button"
+              className="back-button-full-width"
             >
               ← Back to Companies
             </button>
             <h3 className="company-title">
-              {selectedCompany.agency_name} - {companyLines.length} Lines
+              {selectedCompany.agency_name}
             </h3>
           </div>
           
@@ -481,30 +546,61 @@ const ResultsDisplay = ({
                         return (line.route_long_name || '').toLowerCase().includes(searchLower);
                       case 'route_long_name':
                         return (line.route_long_name || '').toLowerCase().includes(searchLower);
-                      default:
-                        return (line.route_short_name || '').toLowerCase().includes(searchLower) ||
-                               (line.route_long_name || '').toLowerCase().includes(searchLower);
+
+                                              default:
+                          return (line.route_short_name || '').toLowerCase().includes(searchLower) ||
+                                 (line.route_long_name || '').toLowerCase().includes(searchLower);
                     }
                   });
                 }
                 
-                return filteredCompanyLines.map((line, idx) => (
-                  <div 
-                    key={line._id || idx} 
-                    className="company-line-card"
-                    onClick={() => handleLineClick(line)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <div className="line-number">
-                      Line {line.route_short_name}
-                    </div>
-                    {line.route_long_name && (
-                      <div className="line-description">
-                        {line.route_long_name}
+                // Sort company lines based on search filter
+                filteredCompanyLines = filteredCompanyLines.sort((a, b) => {
+                  switch (searchType) {
+                    case 'route_short_name':
+                      // Sort numerically for route numbers
+                      const aNum = parseInt(a.route_short_name) || 0;
+                      const bNum = parseInt(b.route_short_name) || 0;
+                      return aNum - bNum;
+                    case 'route_long_name':
+                      return (a.route_long_name || '').localeCompare(b.route_long_name || '', 'he');
+                    default:
+                      // Default to route number sorting
+                      const aNumDefault = parseInt(a.route_short_name) || 0;
+                      const bNumDefault = parseInt(b.route_short_name) || 0;
+                      return aNumDefault - bNumDefault;
+                  }
+                });
+                
+                return filteredCompanyLines.map((line, idx) => {
+                  // Extract city information from route_long_name
+                  const cityMatch = line.route_long_name?.match(/-([^-]+)-/);
+                  const cityName = cityMatch ? cityMatch[1].trim() : '';
+                  
+                  return (
+                    <div 
+                      key={line._id || idx} 
+                      className="company-line-card"
+                      onClick={() => handleLineClick(line)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className="line-number">
+                        Line {line.route_short_name}
                       </div>
-                    )}
-                  </div>
-                ));
+                      {line.route_long_name && (
+                        <div className="line-description">
+                            {line.route_long_name}
+                          </div>
+                      )}
+                      {cityName && (
+                        <div className="line-city">
+                          🏙️ {cityName}
+                        </div>
+                      )}
+
+                    </div>
+                  );
+                });
               })()}
             </div>
           )}

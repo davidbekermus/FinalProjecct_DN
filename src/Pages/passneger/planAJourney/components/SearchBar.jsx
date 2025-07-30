@@ -28,8 +28,7 @@ const SearchBar = ({ value, onChange, onSubmit, placeholder = 'Search...', searc
       return [
         { key: 'station_name', label: 'Search by Station Name' },
         { key: 'station_id', label: 'Search by Station ID' },
-        { key: 'city_name', label: 'Search by City Name' },
-        { key: 'station_code', label: 'Search by Station Code' }
+        { key: 'city_name', label: 'Search by City Name' }
       ];
     } else if (searchMode === 'bus_lines') {
       return [
@@ -40,13 +39,12 @@ const SearchBar = ({ value, onChange, onSubmit, placeholder = 'Search...', searc
       return [
         { key: 'station_name', label: 'Search by Station Name' },
         { key: 'station_id', label: 'Search by Station ID' },
-        { key: 'city_name', label: 'Search by City Name' },
-        { key: 'station_code', label: 'Search by Station Code' }
+        { key: 'city_name', label: 'Search by City Name' }
       ];
     } else if (searchMode === 'company_lines') {
       return [
         { key: 'route_short_name', label: 'Search by Line Number' },
-        { key: 'city_name', label: 'Search by City Name' }
+        { key: 'route_long_name', label: 'Search by Route Name' }
       ];
     } else {
       return [

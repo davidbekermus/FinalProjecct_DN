@@ -91,11 +91,6 @@
   flex-wrap: wrap;
 }
 
-.flex-spacer {
-  flex-grow: 1; /* Pushes nav links to the right */
-  min-width: 1rem;
-}
-
 .logo-title-group {
   display: flex;
   align-items: center;
@@ -118,6 +113,11 @@
   font-weight: 600;
   color: var(--text-light);
   margin: 0;
+  transition: opacity 0.3s ease;
+}
+
+.flex-spacer {
+  flex-grow: 1;
 }
 
 .nav-links {
@@ -132,7 +132,6 @@
   justify-content: flex-end; /* Align nav items to the right within their container */
   min-width: 0;
   overflow-x: visible;
-  margin-right: 2rem; /* Pull links slightly left from the right edge, increased */
 }
 
 .nav-link {
