@@ -45,10 +45,6 @@ const StationLines = () => {
       const response = await api.get(`/routes/station/${stationId}`);
       const data = response.data;
 
-      console.log("Raw data:", data);
-
-      console.log("Received routes:", data.routes.length);
-
       if (!data.routes || data.routes.length === 0) {
         setError("No lines found for this station");
         setLoading(false);
@@ -66,6 +62,7 @@ const StationLines = () => {
           agency_name: busLineData?.agency_name || "Unknown",
           gtfs_route_id: busLineData?.id || route._id,
           routeDescription: busLineData?.route_desc || `Route serving ${route.stations?.length || 0} stations`,
+          route_mkt: busLineData?.route_mkt || route.route_mkt,
           busLineId: busLineData,
         };
       });
@@ -89,14 +86,15 @@ const StationLines = () => {
   const handleBack = () => navigate(-1);
 
   const handleLineClick = (line) => {
-    console.log("Clicked line:", line);
-    navigate(`/bus-line-route/${line._id}`, {
+    navigate('/RouteCounter', {
       state: {
+        stopId: station.id,
+        stopName: station.name,
         routeShortName: line.route_short_name,
         routeLongName: line.route_long_name,
         agencyName: line.agency_name,
-        line: line,
-      },
+        route_mkt: line.route_mkt || line.busLineId?.route_mkt || undefined
+      }
     });
   };
 
@@ -130,21 +128,37 @@ const StationLines = () => {
 
             {!loading && lines.length > 0 && (
               <div className="lines-grid">
-                {lines.map((line, index) => (
-                  <div
-                    key={line._id || index}
-                    className="line-card"
-                    onClick={() => handleLineClick(line)}
-                  >
-                    <div className="line-number">{line.route_short_name}</div>
-                    <div className="line-details">
-                      <div className="line-name">{line.route_long_name}</div>
-                      <div className="line-route">{line.routeDescription}</div>
-                      <div className="line-agency">{line.agency_name}</div>
+                {lines.map((line, index) => {
+                  // Extract city information from route_long_name
+                  const cityMatch = line.route_long_name?.match(/-([^-]+)-/);
+                  const cityName = cityMatch ? cityMatch[1].trim() : '';
+                  
+                  return (
+                    <div
+                      key={line._id || index}
+                      className="line-card"
+                      onClick={() => handleLineClick(line)}
+                    >
+                      <div className="line-number">
+                        Line {line.route_short_name}
+                      </div>
+                      {line.route_long_name && (
+                        <div className="line-description">
+                          {line.route_long_name}
+                        </div>
+                      )}
+                      {cityName && (
+                        <div className="line-city">
+                          🏙️ {cityName}
+                        </div>
+                      )}
+                      
+                      <div className="line-agency">
+                        🚌 {line.agency_name}
+                      </div>
                     </div>
-                    <div className="line-arrow">→</div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

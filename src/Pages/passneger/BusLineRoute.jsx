@@ -14,6 +14,8 @@ const BusLineRoute = () => {
   const [stops, setStops] = useState([]);
   const [routeInfo, setRouteInfo] = useState(null);
 
+  const handleBack = () => navigate(-1);
+
   useEffect(() => {
     const fetchRouteAndStops = async () => {
       setLoading(true);
@@ -47,15 +49,24 @@ const BusLineRoute = () => {
       />
       <main className="bus-line-route-main">
         <div className="content-wrapper">
+          <button className="back-btn" onClick={handleBack}>
+            ← Back
+          </button>
           <h2>Bus Line Route</h2>
           {location.state && (
-            <div className="route-info">
-              <p>
-                <strong>Route Name:</strong> {location.state.routeLongName || routeInfo?.route_long_name}
-              </p>
-              <p>
-                <strong>Company:</strong> {location.state.agencyName || routeInfo?.agency_name}
-              </p>
+            <div className="route-info-card">
+              <div className="line-number">
+                Line {location.state.routeShortName || routeInfo?.route_short_name}
+              </div>
+              {location.state.routeLongName && (
+                <div className="line-description">
+                  {location.state.routeLongName || routeInfo?.route_long_name}
+                </div>
+              )}
+              
+              <div className="line-agency">
+                {location.state.agencyName || routeInfo?.agency_name}
+              </div>
             </div>
           )}
           {loading ? (
@@ -72,8 +83,7 @@ const BusLineRoute = () => {
                     <div className="stop-info">
                       <span className="stop-name">{stop.name}</span>
                       <button
-                        className="stop-details-btn"
-                        style={{ marginLeft: 10 }}
+                        className="choose-station-btn"
                         onClick={() => navigate("/RouteCounter", { 
                           state: { 
                             stopId: stop.id, 
@@ -85,7 +95,7 @@ const BusLineRoute = () => {
                           } 
                         })}
                       >
-                        Route Counter
+                        Choose This Station
                       </button>
                     </div>
                   </div>

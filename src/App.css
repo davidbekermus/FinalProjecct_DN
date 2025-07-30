@@ -359,7 +359,7 @@ html, body {
   overflow-x: hidden;
 }
 
-.mainpage-layout, .home-main, .signin-main, .signup-main, .transport-main {
+.home-main, .signin-main, .signup-main, .transport-main {
   margin: 0 auto;
   max-width: 1200px;
   width: 100%;

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { api } from '../../../utils/api';
+import axios from 'axios';
 import Header from '../../../Components/Header';
 import Footer from '../../../Components/Footer';
 import SearchBar from './components/SearchBar';
@@ -24,21 +26,27 @@ const removeDuplicates = (data) => {
 };
 
 const MainPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Get filter from URL or default to 'default'
+  const urlFilter = searchParams.get('filter') || 'default';
+  const urlCompany = searchParams.get('company') || null;
+  
   // State for results, loading, error, bus lines view, search term, and nearby stations
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showBusLines, setShowBusLines] = useState(false);
+  const [showBusLines, setShowBusLines] = useState(urlFilter === 'bus_lines');
   const [searchTerm, setSearchTerm] = useState('');
-  const [showNearbyStations, setShowNearbyStations] = useState(false);
+  const [showNearbyStations, setShowNearbyStations] = useState(urlFilter === 'nearby_stations');
   const [nearbyStations, setNearbyStations] = useState([]);
   const [locationLoading, setLocationLoading] = useState(false);
-  const [showStationSearch, setShowStationSearch] = useState(false);
+  const [showStationSearch, setShowStationSearch] = useState(urlFilter === 'station');
   const [allStations, setAllStations] = useState([]);
   const [stationsLoading, setStationsLoading] = useState(false);
   const [searchType, setSearchType] = useState('agency_name'); // Added for dropdown search options
-  const [showBusCompanies, setShowBusCompanies] = useState(false); // Added for bus companies
-  const [selectedCompany, setSelectedCompany] = useState(null); // Added for FilterByCompany
+  const [showBusCompanies, setShowBusCompanies] = useState(urlFilter === 'company_lines'); // Added for bus companies
+  const [selectedCompany, setSelectedCompany] = useState(urlCompany ? { agency_name: urlCompany } : null); // Added for FilterByCompany
 
   // Reset search term when switching modes
   useEffect(() => {
@@ -54,6 +62,8 @@ const MainPage = () => {
       setSearchType('route_short_name');
     } else if (selectedCompany) {
       setSearchType('route_short_name');
+    } else if (showBusCompanies) {
+      setSearchType('agency_name');
     } else {
       setSearchType('agency_name');
     }
@@ -64,7 +74,7 @@ const MainPage = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await api.get(
+        const response = await axios.get(
           'https://open-bus-stride-api.hasadna.org.il/gtfs_agencies/list'
         );
         const data = response.data;
@@ -92,9 +102,23 @@ const MainPage = () => {
     setSearchType(type);
   };
 
+  // Function to update URL with filter parameter
+  const updateFilterInURL = (filter, company = null) => {
+    const params = { filter };
+    if (company) {
+      params.company = company;
+    }
+    setSearchParams(params);
+  };
+
   // Handler for FilterByLocation click
   const handleLocationClick = async () => {
     setShowBusLines(false);
+    setShowNearbyStations(false);
+    setShowStationSearch(false);
+    setShowBusCompanies(false);
+    setSelectedCompany(null);
+    updateFilterInURL('nearby_stations');
     setShowNearbyStations(true);
     setShowStationSearch(false);
     setShowBusCompanies(false);
@@ -161,6 +185,11 @@ const MainPage = () => {
   const handleStationSearchClick = async () => {
     setShowBusLines(false);
     setShowNearbyStations(false);
+    setShowStationSearch(false);
+    setShowBusCompanies(false);
+    setSelectedCompany(null);
+    updateFilterInURL('station');
+    setShowNearbyStations(false);
     setShowStationSearch(true);
     setShowBusCompanies(false);
     setStationsLoading(true);
@@ -209,6 +238,7 @@ const MainPage = () => {
     setShowBusCompanies(true);
     // Reset selected company to show all companies
     setSelectedCompany(null);
+    updateFilterInURL('company_lines');
   };
 
   return (
@@ -230,7 +260,14 @@ const MainPage = () => {
           {/* Right: Three filter/result-type components */}
           <div className="mainpage-right">
             <FilterByLocation onClick={handleLocationClick} />
-            <FilterByline onClick={() => { setShowBusLines(true); setShowNearbyStations(false); setShowStationSearch(false); setShowBusCompanies(false); }} />
+            <FilterByline onClick={() => { 
+              setShowBusLines(true); 
+              setShowNearbyStations(false); 
+              setShowStationSearch(false); 
+              setShowBusCompanies(false);
+              setSelectedCompany(null);
+              updateFilterInURL('bus_lines');
+            }} />
             <FilterByStation onClick={handleStationSearchClick} />
             <FilterByCompany onClick={handleCompanyClick} />
           </div>
@@ -254,6 +291,7 @@ const MainPage = () => {
                 showBusCompanies={showBusCompanies}
                 selectedCompany={selectedCompany}
                 setSelectedCompany={setSelectedCompany}
+                updateFilterInURL={updateFilterInURL}
               />
           )}
         </div>

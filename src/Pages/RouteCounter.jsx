@@ -12,6 +12,7 @@ const RouteCounter = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [storedRouteData, setStoredRouteData] = useState(null);
+  const [selectedDirection, setSelectedDirection] = useState("1"); // Default to Direction 1
 
   // Get data from navigation state or stored data
   const { stopId, stopName, routeShortName, routeLongName, agencyName, route_mkt } = location.state || {};
@@ -29,6 +30,7 @@ const RouteCounter = () => {
         routeLongName,
         agencyName,
         route_mkt,
+        selectedDirection: selectedDirection, // Store current selected direction
         timestamp: Date.now()
       };
       localStorage.setItem("pendingRouteCounter", JSON.stringify(routeCounterData));
@@ -49,6 +51,8 @@ const RouteCounter = () => {
         if (dataAge < 5 * 60 * 1000) {
           // Update the component state with stored data
           setStoredRouteData(parsedData);
+          // Set the direction from stored data or default to "1"
+          setSelectedDirection(parsedData.selectedDirection || "1");
           // Clear the stored data
           localStorage.removeItem("pendingRouteCounter");
         } else {
@@ -81,7 +85,8 @@ const RouteCounter = () => {
         lineShortName: currentData.routeShortName,
         routeLongName: currentData.routeLongName,
         agencyName: currentData.agencyName,
-        route_mkt: currentData.route_mkt
+        route_mkt: currentData.route_mkt,
+        routeDirection: selectedDirection
       });
 
       if (response.data.success) {
@@ -123,25 +128,45 @@ const RouteCounter = () => {
       <Header title="Route Counter" />
       <main className="route-counter-main">
         <div className="route-counter-content">
+          <button className="back-btn" onClick={handleBack}>
+            ← Back
+          </button>
           <h2>Route Counter</h2>
           
           <div className="info-section">
-            <div className="info-card">
-              <h3>Selected Bus Station</h3>
-              <p className="station-name">{currentData.stopName}</p>
+            <div className="station-info-card">
+              <div className="station-icon">🚉</div>
+              <div className="station-details">
+                <div className="station-name">{currentData.stopName}</div>
+              </div>
             </div>
             
-            <div className="info-card">
-              <h3>Selected Bus Line</h3>
-              <p className="line-name">{currentData.routeShortName}</p>
-              {currentData.routeLongName && <p className="line-description">{currentData.routeLongName}</p>}
-              {currentData.agencyName && <p className="agency-name">{currentData.agencyName}</p>}
+            <div className="line-info-card">
+              <div className="line-number">
+                Line {currentData.routeShortName}
+              </div>
+              {currentData.routeLongName && (
+                <div className="line-description">
+                  {currentData.routeLongName}
+                </div>
+              )}
+              {currentData.agencyName && (
+                <div className="line-agency">
+                  🚌 {currentData.agencyName}
+                </div>
+              )}
             </div>
+          </div>
 
-            <div className="info-card">
-              <h3>Route Market (route_mkt)</h3>
-              <p className="route-mkt">{currentData.route_mkt}</p>
-            </div>
+          {/* Direction Selection */}
+          <div className="direction-toggle">
+            <span className="direction-label">Direction {selectedDirection}:</span>
+            <button
+              type="button"
+              className={`toggle-slider ${selectedDirection === "1" ? "left" : "right"}`}
+              onClick={() => setSelectedDirection(selectedDirection === "1" ? "2" : "1")}
+            >
+            </button>
           </div>
 
           {error && (
@@ -163,13 +188,6 @@ const RouteCounter = () => {
               className="submit-button"
             >
               {loading ? "Submitting..." : "Submit"}
-            </button>
-            
-            <button 
-              onClick={handleBack} 
-              className="back-button"
-            >
-              ← Back
             </button>
           </div>
         </div>
