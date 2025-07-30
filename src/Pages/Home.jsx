@@ -9,7 +9,7 @@ const Home = () => {
       <section className="hero-fullscreen-video">
         <video
           className="hero-video"
-          src="/DYNACAP_frontpage_video.mp4" /* Corrected path */
+          src="public/DYNACAP_frontpage_video.mp4" /* Corrected path */
           autoPlay
           loop
           muted
