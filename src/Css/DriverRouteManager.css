@@ -30,6 +30,40 @@
   color: #666;
 }
 
+.direction-selector {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.direction-selector label {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.direction-select {
+  padding: 0.5rem 1rem;
+  border: 2px solid #3498db;
+  border-radius: 6px;
+  background: white;
+  color: #2c3e50;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.direction-select:focus {
+  outline: none;
+  border-color: #2980b9;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.direction-select:hover {
+  border-color: #2980b9;
+}
+
 .driver-route-manager-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -244,6 +278,25 @@
   color: #7f8c8d;
   font-size: 0.9rem;
   margin: 0;
+}
+
+.direction-indicator {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: #e3f2fd;
+  border-radius: 6px;
+  border-left: 4px solid #3498db;
+}
+
+.direction-label {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-right: 0.5rem;
+}
+
+.direction-value {
+  color: #7c3aed;
+  font-weight: 500;
 }
 
 .stop-status {

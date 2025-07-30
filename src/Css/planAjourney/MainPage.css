@@ -1,9 +1,13 @@
 .mainpage-layout {
   display: flex;
   flex-direction: column;
-  min-height: 80vh;
+  height: 100vh;
+  width: 100vw;
   background: linear-gradient(135deg, #e0e7ef 0%, #c7d2fe 100%);
-  margin-top: 100px; /* Add space for fixed header */
+  padding-top: 120px; /* Account for fixed header */
+  box-sizing: border-box;
+  margin: 0;
+  max-width: none;
 }
 
 .mainpage-top {
@@ -15,9 +19,10 @@
 .mainpage-main {
   display: flex;
   flex: 1;
-  min-height: 60vh;
+  height: calc(100vh - 200px);
   padding: 2rem;
   gap: 2rem;
+  overflow: hidden;
 }
 
 .mainpage-left {
@@ -29,6 +34,8 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .mainpage-right {
@@ -41,6 +48,8 @@
   box-shadow: 0 2px 8px rgba(59,130,246,0.08);
   padding: 1rem 0.5rem;
   align-items: stretch;
+  height: 100%;
+  overflow-y: auto;
 }
 
 /* Search bar styles */
@@ -258,22 +267,42 @@
 
 .company-lines-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
 }
 
 .company-line-card {
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 1rem;
+  border-radius: 12px;
+  padding: 1.25rem;
   background: #fff;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.company-line-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
 }
 
 .company-line-card:hover {
-  box-shadow: 0 4px 12px rgba(59,130,246,0.15);
-  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59,130,246,0.15);
+  transform: translateY(-3px);
+  border-color: #3b82f6;
+}
+
+.company-line-card:hover::before {
+  transform: scaleX(1);
 }
 
 .back-button {
@@ -291,11 +320,31 @@
   background: #2563eb;
 }
 
-.company-header {
+.back-button-full-width {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  font-weight: 500;
   margin-bottom: 1rem;
+}
+
+.back-button-full-width:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(59,130,246,0.2);
+}
+
+.company-header {
+  margin-bottom: 1.5rem;
   display: flex;
-  align-items: center;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .company-title {
@@ -307,15 +356,25 @@
 
 .line-number {
   color: #1f2937;
+  font-size: 1.3em;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.line-number::before {
+  content: '🚌';
   font-size: 1.1em;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
 }
 
 .line-description {
   color: #6b7280;
-  font-size: 0.9em;
+  font-size: 0.95em;
+  line-height: 1.4;
   margin-top: 0.5rem;
+  font-weight: 400;
 }
 
 /* Company grid styles */
@@ -343,44 +402,125 @@
 
 /* Station search styles */
 .station-card {
-  transition: all 0.2s ease;
-  background: #fff;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  padding: 1.25rem;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.station-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
 }
 
 .station-card:hover {
-  box-shadow: 0 4px 12px rgba(59,130,246,0.15);
-  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59,130,246,0.15);
+  transform: translateY(-3px);
+  border-color: #3b82f6;
+}
+
+.station-card:hover::before {
+  transform: scaleX(1);
 }
 
 .stations-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
 }
 
+.station-name {
+  color: #1f2937;
+  font-size: 1.3em;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.station-city {
+  color: #6b7280;
+  font-size: 0.95em;
+  line-height: 1.4;
+  margin-top: 0.5rem;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.station-code {
+  color: #3b82f6;
+  font-size: 0.9em;
+  font-weight: 500;
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 /* Nearby stations styles */
-.nearby-stations-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.nearby-stations-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
 }
 
-.nearby-station-item {
-  background: #fff;
+.nearby-station-card {
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 0.5rem;
-  transition: all 0.2s ease;
+  border-radius: 12px;
+  padding: 1.25rem;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
 
-.nearby-station-item:hover {
-  box-shadow: 0 2px 8px rgba(59,130,246,0.1);
-  transform: translateX(4px);
+.nearby-station-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.nearby-station-card:hover {
+  box-shadow: 0 8px 25px rgba(59,130,246,0.15);
+  transform: translateY(-3px);
+  border-color: #3b82f6;
+}
+
+.nearby-station-card:hover::before {
+  transform: scaleX(1);
+}
+
+.station-distance {
+  color: #059669;
+  font-size: 0.9em;
+  font-weight: 500;
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 /* Bus lines styles */
@@ -392,35 +532,39 @@
 .bus-lines-agency-group {
   margin-bottom: 2rem;
   background: #fff;
-  border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 1px 4px rgba(59,130,246,0.08);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.08);
 }
 
 .bus-lines-agency-header {
   color: #1e40af;
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
   border-bottom: 2px solid #dbeafe;
+  font-weight: 600;
 }
 
-.bus-lines-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.bus-lines-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
 }
 
-.bus-line-item {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #f1f5f9;
-  transition: background 0.2s;
+
+
+.line-city {
+  color: #059669;
+  font-size: 0.9em;
+  font-weight: 500;
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
-.bus-line-item:hover {
-  background: #f8fafc;
-  padding-left: 0.5rem;
-}
+
 
 /* Pagination styles */
 .pagination-controls {
