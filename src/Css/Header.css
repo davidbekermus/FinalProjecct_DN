@@ -88,7 +88,7 @@
   padding: 0 1rem;
   min-width: 0;
   overflow-x: visible;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* Prevent wrapping of the main container */
 }
 
 .logo-title-group {
@@ -96,6 +96,7 @@
   align-items: center;
   margin-right: 0; /* No extra margin needed here as spacer handles spacing */
   margin-left: 0;
+  flex-shrink: 0; /* Prevent logo from shrinking */
 }
 
 .logo-link {
@@ -114,24 +115,45 @@
   color: var(--text-light);
   margin: 0;
   transition: opacity 0.3s ease;
+  white-space: nowrap; /* Prevent title from wrapping */
 }
 
 .flex-spacer {
   flex-grow: 1;
+  flex-shrink: 0; /* Prevent spacer from shrinking */
 }
 
 .nav-links {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem; /* Consistent gap between all nav links */
   align-items: center;
   position: relative;
   transition: opacity 0.3s ease;
-  padding-right: 0;
-  flex-wrap: wrap;
-  white-space: normal;
+  padding-right: 1rem; /* Add right padding to prevent Sign Out from touching screen edge */
+  flex-wrap: nowrap; /* Prevent nav links from wrapping */
+  white-space: nowrap;
   justify-content: flex-end; /* Align nav items to the right within their container */
   min-width: 0;
   overflow-x: visible;
+  flex-shrink: 0; /* Prevent nav from shrinking */
+}
+
+.nav-link-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: fit-content;
+  flex-shrink: 0;
+  width: auto; /* Allow natural width */
+  flex: 0 0 auto; /* Don't grow or shrink */
+}
+
+.nav-link-placeholder {
+  width: 0;
+  height: 0;
+  visibility: hidden;
+  flex-shrink: 0;
+  flex: 0 0 0; /* Take no space */
 }
 
 .nav-link {
@@ -148,14 +170,138 @@
   display: inline-block;
   vertical-align: middle;
   white-space: nowrap;
+  flex-shrink: 0; /* Prevent individual links from shrinking */
+  margin: 0; /* Remove any default margins to ensure consistent spacing */
+  min-width: fit-content; /* Ensure links don't shrink below their content */
+  text-align: center; /* Center text within links */
+}
+
+/* Specific styling for the greeting span */
+.nav-link[style*="cursor: default"] {
+  cursor: default !important;
+  font-weight: 600;
+  color: #fff;
+  padding: 0.3rem 0.8rem;
+  margin: 0;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+/* Specific styling for the sign out button */
+.nav-link[onclick*="handleSignOut"] {
+  background: none !important;
+  border: none !important;
+  cursor: pointer;
+  padding: 0.3rem 0.8rem;
+  margin: 0;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+/* Ensure consistent spacing between all nav containers */
+.nav-links .nav-link-container + .nav-link-container {
+  margin-left: 1.5rem; /* Same as gap */
+}
+
+/* Override any browser default spacing */
+.nav-links .nav-link-container {
+  margin: 0;
+  padding: 0;
 }
 
 .nav-link:hover {
   color: var(--hover-accent);
 }
 
+/* Ensure all nav links have the same spacing regardless of content */
+.nav-links > * {
+  margin: 0;
+  padding: 0.3rem 0.8rem;
+  flex-shrink: 0;
+  min-width: fit-content;
+}
+
 /* Remove specific spacer styles that are no longer needed */
 .left-flex-spacer,
 .right-flex-spacer {
   display: none; /* Hide the old spacer classes */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .modern-header-container {
+    padding: 0 0.5rem;
+  }
+  
+  .site-title {
+    font-size: 1.2rem; /* Smaller title on mobile */
+  }
+  
+  .logo-image {
+    height: 50px; /* Smaller logo on mobile */
+    margin-right: 0.5rem;
+  }
+  
+  .nav-links {
+    gap: 1rem; /* Maintain consistent spacing on medium screens */
+  }
+  
+  .nav-link {
+    font-size: 0.85rem; /* Smaller font on mobile */
+    padding: 0.2rem 0.5rem; /* Smaller padding on mobile */
+  }
+  
+  /* Ensure consistent spacing for all nav elements on medium screens */
+  .nav-links > * {
+    padding: 0.2rem 0.5rem;
+  }
+  
+  .nav-link[style*="cursor: default"] {
+    padding: 0.2rem 0.5rem;
+  }
+  
+  .nav-link[onclick*="handleSignOut"] {
+    padding: 0.2rem 0.5rem;
+  }
+  
+  .nav-link-container {
+    min-width: fit-content;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .site-title {
+    font-size: 1rem;
+  }
+  
+  .logo-image {
+    height: 40px;
+  }
+  
+  .nav-links {
+    gap: 0.75rem; /* Maintain consistent spacing on small screens */
+  }
+  
+  .nav-link {
+    font-size: 0.8rem;
+    padding: 0.15rem 0.4rem;
+  }
+  
+  /* Ensure consistent spacing for all nav elements on small screens */
+  .nav-links > * {
+    padding: 0.15rem 0.4rem;
+  }
+  
+  .nav-link[style*="cursor: default"] {
+    padding: 0.15rem 0.4rem;
+  }
+  
+  .nav-link[onclick*="handleSignOut"] {
+    padding: 0.15rem 0.4rem;
+  }
+  
+  .nav-link-container {
+    min-width: fit-content;
+  }
 }

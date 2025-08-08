@@ -33,3 +33,21 @@ export const signinValidation = (formData) => {
   // You may want to add similar password checks here if needed
   return "";
 };
+
+export const imageValidation = (file) => {
+  if (!file) {
+    return "Please select an image file";
+  }
+  
+  // Check file type
+  if (!file.type.startsWith("image/")) {
+    return "Please select a valid image file (JPEG, PNG, GIF, etc.)";
+  }
+  
+  // Check file size (5MB limit)
+  if (file.size > 5 * 1024 * 1024) {
+    return "Image size must be less than 5MB";
+  }
+  
+  return "";
+};

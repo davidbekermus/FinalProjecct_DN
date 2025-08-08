@@ -59,29 +59,77 @@ const Header = ({ title, transparent }) => {
 
         {/* Nav links */}
         <nav className="nav-links">
-          {!user || user.role !== "driver" ? (
-            <Link to="/plan-journey" className="nav-link">
-              Plan Journey
-            </Link>
-          ) : null}
-          {user && user.role === "driver" && (
-            <Link to="/UiDriver" className="nav-link">
-              Start a Journey
-            </Link>
-          )}
-          {user ? (
-            <>
+          {/* Position 1: Journey-related link */}
+          <div className="nav-link-container">
+            {!user || user.role !== "driver" ? (
+              <Link to="/plan-journey" className="nav-link">
+                Plan Journey
+              </Link>
+            ) : (
+              <Link to="/UiDriver" className="nav-link">
+                Start a Journey
+              </Link>
+            )}
+          </div>
+
+          {/* Position 2: User greeting (only for logged in users) */}
+          <div className="nav-link-container">
+            {user ? (
               <span
                 className="nav-link"
                 style={{ cursor: "default", fontWeight: 600 }}
               >
                 Hello {user.name}
               </span>
-              {user.role === "admin" && (
+            ) : (
+              <Link to="/Login" className="nav-link">
+                Login
+              </Link>
+            )}
+          </div>
+
+          {/* Position 3: Admin link, Sign Up, or Sign Out for drivers/passengers */}
+          <div className="nav-link-container">
+            {user ? (
+              user.role === "admin" ? (
                 <Link to="/AdminPage" className="nav-link">
                   Admin
                 </Link>
-              )}
+              ) : user.role === "driver" ? (
+                <button
+                  className="nav-link"
+                  onClick={handleSignOut}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Sign Out
+                </button>
+              ) : (
+                <button
+                  className="nav-link"
+                  onClick={handleSignOut}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Sign Out
+                </button>
+              )
+            ) : (
+              <Link to="/SignUp" className="nav-link">
+                Sign Up
+              </Link>
+            )}
+          </div>
+
+          {/* Position 4: Sign Out (only for admins) */}
+          <div className="nav-link-container">
+            {user && user.role === "admin" ? (
               <button
                 className="nav-link"
                 onClick={handleSignOut}
@@ -93,17 +141,10 @@ const Header = ({ title, transparent }) => {
               >
                 Sign Out
               </button>
-            </>
-          ) : (
-            <>
-              <Link to="/Login" className="nav-link">
-                Login
-              </Link>
-              <Link to="/SignUp" className="nav-link">
-                Sign Up
-              </Link>
-            </>
-          )}
+            ) : (
+              <div className="nav-link-placeholder"></div>
+            )}
+          </div>
         </nav>
       </div>
     </header>
