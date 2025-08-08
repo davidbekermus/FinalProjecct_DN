@@ -1,37 +1,71 @@
 .driver-route-manager-main {
   min-height: 100vh;
   background-color: #f5f5f5;
-  padding: 2rem 0;
+  padding: 1rem 0;
+  padding-top: 120px; /* Add top padding to account for fixed header */
 }
 
 .driver-route-manager-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 1rem;
 }
 
 .route-info-header {
   background: white;
-  padding: 1.5rem;
-  border-radius: 10px;
+  padding: 1rem;
+  border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   text-align: center;
 }
 
 .route-info-header h2 {
   color: #2c3e50;
-  margin-bottom: 0.5rem;
-  font-size: 1.8rem;
+  margin-bottom: 0.25rem;
+  font-size: 1.5rem;
 }
 
 .route-info-header p {
-  margin: 0.25rem 0;
+  margin: 0.15rem 0;
   color: #666;
+  font-size: 0.9rem;
+}
+
+/* Route Progress Bar */
+.route-progress {
+  margin: 0.75rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.progress-bar {
+  width: 100%;
+  max-width: 400px;
+  height: 6px;
+  background: #e9ecef;
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3498db, #2980b9);
+  transition: width 0.3s ease;
+  border-radius: 3px;
+}
+
+.progress-text {
+  font-size: 0.8rem;
+  color: #7f8c8d;
+  font-weight: 500;
 }
 
 .direction-selector {
-  margin-top: 1rem;
+  margin-top: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,15 +75,16 @@
 .direction-selector label {
   font-weight: 600;
   color: #2c3e50;
+  font-size: 0.9rem;
 }
 
 .direction-select {
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.8rem;
   border: 2px solid #3498db;
   border-radius: 6px;
   background: white;
   color: #2c3e50;
-  font-size: 1rem;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -64,96 +99,235 @@
   border-color: #2980b9;
 }
 
-.driver-route-manager-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  min-height: 600px;
-}
-
-/* Left Side - Stops Panel */
-.stops-panel {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  height: fit-content;
-}
-
-.stops-panel h3 {
-  color: #2c3e50;
-  margin-bottom: 1rem;
-  font-size: 1.3rem;
-  border-bottom: 2px solid #3498db;
-  padding-bottom: 0.5rem;
-}
-
-.stops-list {
-  max-height: 500px;
-  overflow-y: auto;
-}
-
-.stop-item {
-  display: flex;
-  align-items: center;
-  padding: 1rem;
-  margin-bottom: 0.5rem;
-  border-radius: 8px;
-  border: 2px solid #e9ecef;
-  transition: all 0.3s ease;
-  background: #f8f9fa;
-}
-
-.stop-item.current-stop {
-  border-color: #3498db;
-  background: #e3f2fd;
-  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
-}
-
-.stop-number {
-  background: #3498db;
-  color: white;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+/* Auto-refresh toggle */
+.auto-refresh-toggle {
+  margin-top: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  margin-right: 1rem;
-  flex-shrink: 0;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
-.current-stop .stop-number {
-  background: #e74c3c;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
-
-.stop-info {
-  flex: 1;
-}
-
-.stop-name {
-  font-weight: 600;
+.auto-refresh-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 500;
   color: #2c3e50;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.auto-refresh-toggle input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.refresh-btn {
+  padding: 0.4rem 0.8rem;
+  background: #f39c12;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.refresh-btn:hover:not(:disabled) {
+  background: #e67e22;
+  transform: translateY(-1px);
+}
+
+.refresh-btn:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.driver-route-manager-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  min-height: 500px;
+}
+
+/* Left Side - Current Stop Panel (MAIN FOCUS) */
+.current-stop-panel {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.current-stop-panel h3 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  border-bottom: 3px solid #3498db;
+  padding-bottom: 0.5rem;
+}
+
+.current-stop-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.stop-name-large {
+  text-align: center;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #3498db;
+}
+
+.stop-name-large h2 {
+  color: #2c3e50;
+  font-size: 1.5rem;
   margin-bottom: 0.25rem;
 }
 
-.current-indicator {
-  font-size: 0.8rem;
-  color: #e74c3c;
-  font-weight: bold;
-  text-transform: uppercase;
+.stop-number-large {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
-/* Right Side - Controls Panel */
-.controls-panel {
+.loading-large {
+  text-align: center;
+  padding: 2rem;
+  color: #7f8c8d;
+  font-style: italic;
+  font-size: 1rem;
+}
+
+.passenger-status-large {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Passenger Count - LARGE AND PROMINENT */
+.passenger-count-large {
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 3px solid;
+}
+
+.passenger-count-large.has-passengers {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  border-color: #e74c3c;
+  color: white;
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+  animation: pulse-red 2s infinite;
+}
+
+.passenger-count-large.no-passengers {
+  background: linear-gradient(135deg, #27ae60, #229954);
+  border-color: #27ae60;
+  color: white;
+  box-shadow: 0 6px 20px rgba(39, 174, 96, 0.3);
+}
+
+@keyframes pulse-red {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.01); }
+  100% { transform: scale(1); }
+}
+
+.count-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.count-number {
+  font-size: 2.5rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.count-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Stop Decision - LARGE AND CLEAR */
+.stop-decision-large {
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 3px solid;
+}
+
+.stop-decision-large.should-stop {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  border-color: #e74c3c;
+  color: white;
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+  animation: pulse-red 2s infinite;
+}
+
+.stop-decision-large.no-stop {
+  background: linear-gradient(135deg, #27ae60, #229954);
+  border-color: #27ae60;
+  color: white;
+  box-shadow: 0 6px 20px rgba(39, 174, 96, 0.3);
+}
+
+.decision-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.decision-icon {
+  font-size: 2rem;
+  margin-bottom: 0.25rem;
+}
+
+.decision-text h3 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.decision-text p {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+.last-updated-large {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #95a5a6;
+  font-style: italic;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+/* Right Side - Navigation Panel */
+.navigation-panel {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -226,6 +400,7 @@
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  margin-bottom: 1rem;
 }
 
 .arrived-btn:hover:not(:disabled) {
@@ -240,8 +415,33 @@
   opacity: 0.6;
 }
 
-/* Status Panel */
-.status-panel {
+/* Route Completion Button */
+.complete-route-btn {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: celebration 2s ease-in-out infinite;
+}
+
+.complete-route-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+@keyframes celebration {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* Stops List Panel */
+.stops-list-panel {
   background: white;
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -249,7 +449,7 @@
   flex: 1;
 }
 
-.status-panel h3 {
+.stops-list-panel h3 {
   color: #2c3e50;
   margin-bottom: 1rem;
   font-size: 1.3rem;
@@ -257,105 +457,79 @@
   padding-bottom: 0.5rem;
 }
 
-.status-content {
-  height: 100%;
+.stops-list-compact {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.stop-item-compact {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.current-stop-info {
-  margin-bottom: 1.5rem;
-}
-
-.current-stop-info h4 {
-  color: #2c3e50;
-  font-size: 1.4rem;
-  margin-bottom: 0.5rem;
-}
-
-.current-stop-info p {
-  color: #7f8c8d;
-  font-size: 0.9rem;
-  margin: 0;
-}
-
-.direction-indicator {
-  margin-top: 0.5rem;
-  padding: 0.5rem;
-  background: #e3f2fd;
-  border-radius: 6px;
-  border-left: 4px solid #3498db;
-}
-
-.direction-label {
-  font-weight: 600;
-  color: #2c3e50;
-  margin-right: 0.5rem;
-}
-
-.direction-value {
-  color: #7c3aed;
-  font-weight: 500;
-}
-
-.stop-status {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.passenger-count {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 1rem;
+  padding: 0.75rem;
+  margin-bottom: 0.25rem;
+  border-radius: 6px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
   background: #f8f9fa;
-  border-radius: 8px;
-  border-left: 4px solid #3498db;
+  gap: 0.75rem;
 }
 
-.passenger-count .label {
-  font-weight: 600;
-  color: #2c3e50;
+.stop-item-compact.current-stop {
+  border-color: #3498db;
+  background: #e3f2fd;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
 }
 
-.passenger-count .count {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #e74c3c;
+.stop-item-compact.completed-stop {
+  border-color: #27ae60;
+  background: #e8f5e8;
+  opacity: 0.8;
 }
 
-.stop-decision {
-  padding: 1rem;
-  border-radius: 8px;
-  text-align: center;
-  font-weight: 600;
-}
-
-.decision {
+.stop-number-compact {
+  background: #3498db;
+  color: white;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  font-size: 1.1rem;
+  font-weight: bold;
+  font-size: 0.8rem;
+  flex-shrink: 0;
 }
 
-.decision.should-stop {
-  background: #e8f5e8;
+.current-stop .stop-number-compact {
+  background: #e74c3c;
+  animation: pulse 2s infinite;
+}
+
+.completed-stop .stop-number-compact {
+  background: #27ae60;
+}
+
+.stop-name-compact {
+  flex: 1;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+.current-indicator-compact {
+  font-size: 0.7rem;
+  color: #e74c3c;
+  font-weight: bold;
+  text-transform: uppercase;
+  background: #ffeaea;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.completed-indicator-compact {
+  font-size: 0.8rem;
   color: #27ae60;
-  border: 2px solid #27ae60;
-}
-
-.decision.no-stop {
-  background: #fff3cd;
-  color: #856404;
-  border: 2px solid #ffc107;
-}
-
-.decision .icon {
-  font-size: 1.3rem;
+  font-weight: bold;
 }
 
 /* Loading and Error States */
@@ -373,6 +547,24 @@
   background: #fdf2f2;
   border-radius: 6px;
   border: 1px solid #fecaca;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.retry-btn {
+  padding: 0.5rem 1rem;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.3s ease;
+}
+
+.retry-btn:hover {
+  background: #c0392b;
 }
 
 .no-stop-selected {
@@ -383,22 +575,45 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .driver-route-manager-content {
     grid-template-columns: 1fr;
     gap: 1rem;
+  }
+  
+  .current-stop-panel {
+    order: 1;
+  }
+  
+  .navigation-panel {
+    order: 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .driver-route-manager-container {
+    padding: 0 0.5rem;
   }
   
   .control-buttons {
     flex-direction: column;
   }
   
-  .stops-list {
+  .stops-list-compact {
     max-height: 300px;
   }
-  
-  .driver-route-manager-container {
-    padding: 0 0.5rem;
+
+  .auto-refresh-toggle {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .count-number {
+    font-size: 3rem;
+  }
+
+  .decision-text h3 {
+    font-size: 2rem;
   }
 }
 
@@ -411,19 +626,28 @@
     padding: 1rem;
   }
   
-  .stops-panel,
+  .current-stop-panel,
   .navigation-controls,
-  .status-panel {
+  .stops-list-panel {
     padding: 1rem;
   }
   
-  .stop-item {
-    padding: 0.75rem;
+  .stop-item-compact {
+    padding: 0.5rem;
   }
   
   .nav-btn,
-  .arrived-btn {
+  .arrived-btn,
+  .complete-route-btn {
     padding: 0.75rem;
     font-size: 0.9rem;
+  }
+
+  .count-number {
+    font-size: 2.5rem;
+  }
+
+  .decision-text h3 {
+    font-size: 1.5rem;
   }
 } 

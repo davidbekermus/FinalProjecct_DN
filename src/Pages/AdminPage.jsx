@@ -11,6 +11,8 @@ const AdminPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [actionLoading, setActionLoading] = useState({});
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [showImageModal, setShowImageModal] = useState(false);
 
   useEffect(() => {
     fetchPendingDrivers();
@@ -58,6 +60,21 @@ const AdminPage = () => {
     }
   };
 
+  const getImageUrl = (imageFilename) => {
+    if (!imageFilename) return null;
+    return `http://localhost:3000/uploads/${imageFilename}`;
+  };
+
+  const handleImageClick = (imageUrl, driverName) => {
+    setSelectedImage({ url: imageUrl, name: driverName });
+    setShowImageModal(true);
+  };
+
+  const closeImageModal = () => {
+    setShowImageModal(false);
+    setSelectedImage(null);
+  };
+
   if (!user || user.role !== "admin") {
     return (
       <div style={{ padding: "2rem", textAlign: "center" }}>
@@ -89,11 +106,36 @@ const AdminPage = () => {
                 {pendingDrivers.map((driver) => (
                   <div key={driver._id} className="driver-card">
                     <div className="driver-info">
-                      <h4>{driver.name}</h4>
+                      <div className="driver-header">
+                        <h4>{driver.name}</h4>
+                        <span className="status-pending">{driver.status}</span>
+                      </div>
                       <p><strong>Email:</strong> {driver.email}</p>
                       <p><strong>Role:</strong> {driver.role}</p>
-                      <p><strong>Status:</strong> <span className="status-pending">{driver.status}</span></p>
                       <p><strong>Created:</strong> {new Date(driver.createdAt).toLocaleDateString()}</p>
+                      
+                      {/* Driver Image Section */}
+                      {driver.image && (
+                        <div className="driver-image-section">
+                          <p><strong>Uploaded Image:</strong></p>
+                          <div className="driver-image-container">
+                            <img 
+                              src={getImageUrl(driver.image)} 
+                              alt={`${driver.name}'s profile`}
+                              className="driver-image"
+                              onClick={() => handleImageClick(getImageUrl(driver.image), driver.name)}
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'block';
+                              }}
+                            />
+                            <div className="image-error" style={{ display: 'none' }}>
+                              <p>Image not available</p>
+                            </div>
+                          </div>
+                          <small className="image-click-hint">Click image to view larger</small>
+                        </div>
+                      )}
                     </div>
                     <div className="driver-actions">
                       <button
@@ -118,6 +160,35 @@ const AdminPage = () => {
           </div>
         </div>
       </main>
+
+      {/* Image Modal */}
+      {showImageModal && selectedImage && (
+        <div className="image-modal-overlay" onClick={closeImageModal}>
+          <div className="image-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="image-modal-header">
+              <h3>{selectedImage.name}'s Image</h3>
+              <button className="modal-close-btn" onClick={closeImageModal}>
+                ×
+              </button>
+            </div>
+            <div className="image-modal-body">
+              <img 
+                src={selectedImage.url} 
+                alt={`${selectedImage.name}'s profile`}
+                className="modal-image"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
+              />
+              <div className="modal-image-error" style={{ display: 'none' }}>
+                <p>Image not available</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </>
   );

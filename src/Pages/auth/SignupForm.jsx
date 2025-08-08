@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "../../Css/SignUp.css";
 import Footer from "../../Components/Footer";
 import Header from "../../Components/Header";
-import { signupValidation } from "../../utils/validations";
+import { signupValidation, imageValidation } from "../../utils/validations";
 import { AuthContext } from "../../App";
 import { useContext } from "react";
 
@@ -18,13 +18,41 @@ const SignupForm = () => {
     confirmPassword: "",
     role: "passenger",
   });
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // 👈 New state for visibility
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const validationError = imageValidation(file);
+      if (validationError) {
+        setError(validationError);
+        return;
+      }
+
+      setSelectedImage(file);
+      setError("");
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
   };
 
   const togglePasswordVisibility = () => {
@@ -33,16 +61,45 @@ const SignupForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Clear previous errors
+    setError("");
+
+    // Validate image for drivers
+    if (formData.role === "driver" && !selectedImage) {
+      setError("Please upload a profile image or driver's license");
+      return;
+    }
+
     const validationError = signupValidation(formData);
     if (validationError) {
       setError(validationError);
       return;
     }
+
     try {
       setIsLoading(true);
+      
+      // Create FormData for file upload
+      const submitData = new FormData();
+      submitData.append("name", formData.name);
+      submitData.append("email", formData.email);
+      submitData.append("password", formData.password);
+      submitData.append("confirmPassword", formData.confirmPassword);
+      submitData.append("role", formData.role);
+      
+      if (selectedImage) {
+        submitData.append("image", selectedImage);
+      }
+
       const signupResponse = await axios.post(
         "http://localhost:3000/auth/signup",
-        formData
+        submitData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
 
       // Check if this is a driver signup
@@ -185,6 +242,39 @@ const SignupForm = () => {
                 <option value="driver">Driver</option>
               </select>
             </div>
+
+            {/* Image upload section - only show for drivers */}
+            {formData.role === "driver" && (
+              <div className="signup-group">
+                <label htmlFor="image">Profile Image or Driver's License:</label>
+                <div className="image-upload-container">
+                  <input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="image-input"
+                    required
+                  />
+                  {imagePreview && (
+                    <div className="image-preview">
+                      <img src={imagePreview} alt="Preview" />
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="remove-image-btn"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <small className="image-help-text">
+                  Upload a profile picture or driver's license (Max 5MB)
+                </small>
+              </div>
+            )}
+
             <button
               type="submit"
               className="signup-button"
