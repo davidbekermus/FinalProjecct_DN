@@ -1,109 +1,59 @@
-import React, { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import Header from "../../Components/Header";
 import Footer from "../../Components/Footer";
+import { useRouteStops } from "./hooks/useRouteStops";
+import RouteInfoCard from "./components/RouteInfoCard";
+import RouteStopCard from "./components/RouteStopCard";
+import LoadingSpinner from "./planAJourney/components/ui/LoadingSpinner";
+import EmptyState from "./planAJourney/components/ui/EmptyState";
 import "../../Css/BusLineRoute.css";
-import { api } from "../../utils/api";
 
+/**
+ * Component for displaying bus line route with all stops
+ */
 const BusLineRoute = () => {
   const { gtfs_route_id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [stops, setStops] = useState([]);
-  const [routeInfo, setRouteInfo] = useState(null);
+  
+  const { stops, routeInfo, loading, error } = useRouteStops(gtfs_route_id);
 
   const handleBack = () => navigate(-1);
-
-  useEffect(() => {
-    const fetchRouteAndStops = async () => {
-      setLoading(true);
-      setError(null);
-      setStops([]);
-      setRouteInfo(null);
-      try {
-        // Fetch the first route for the bus line from the local backend
-        const res = await api.get(`/routes/line/${gtfs_route_id}`);
-        const data = res.data;
-        if (!data || !data.stations || data.stations.length === 0) {
-          setError("No route or stops found for this bus line.");
-          setLoading(false);
-          return;
-        }
-        setStops(data.stations);
-        setRouteInfo(data.busLineId);
-      } catch (err) {
-        setError(err.response?.data?.message || err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchRouteAndStops();
-  }, [gtfs_route_id]);
+  
+  const routeTitle = location.state?.routeShortName || routeInfo?.route_short_name || gtfs_route_id;
 
   return (
     <div className="bus-line-route-container">
-      <Header
-        title={`line :${location.state?.routeShortName || routeInfo?.route_short_name || gtfs_route_id}`}
-      />
+      <Header title={`line :${routeTitle}`} />
       <main className="bus-line-route-main">
         <div className="content-wrapper">
           <button className="back-btn" onClick={handleBack}>
             ← Back
           </button>
           <h2>Bus Line Route</h2>
-          {location.state && (
-            <div className="route-info-card">
-              <div className="line-number">
-                Line {location.state.routeShortName || routeInfo?.route_short_name}
-              </div>
-              {location.state.routeLongName && (
-                <div className="line-description">
-                  {location.state.routeLongName || routeInfo?.route_long_name}
-                </div>
-              )}
-              
-              <div className="line-agency">
-                {location.state.agencyName || routeInfo?.agency_name}
-              </div>
-            </div>
-          )}
+          
+          <RouteInfoCard routeInfo={routeInfo} locationState={location.state} />
+
           {loading ? (
-            <div>Loading route...</div>
+            <LoadingSpinner message="Loading route..." />
           ) : error ? (
             <div className="error-message">{error}</div>
           ) : stops.length > 0 ? (
             <div className="stops-list route-visual">
-              <h3>Stops for line: {location.state?.routeShortName || routeInfo?.route_short_name}</h3>
+              <h3>Stops for line: {routeTitle}</h3>
               <div className="route-line">
-                {stops.map((stop, idx) => (
-                  <div className="route-stop" key={stop.id || stop._id}>
-                    <div className="route-dot" />
-                    <div className="stop-info">
-                      <span className="stop-name">{stop.name}</span>
-                      <button
-                        className="choose-station-btn"
-                        onClick={() => navigate("/RouteCounter", { 
-                          state: { 
-                            stopId: stop.id, 
-                            stopName: stop.name,
-                            routeShortName: location.state?.routeShortName || routeInfo?.route_short_name,
-                            routeLongName: location.state?.routeLongName || routeInfo?.route_long_name,
-                            agencyName: location.state?.agencyName || routeInfo?.agency_name,
-                            route_mkt: location.state?.route_mkt || routeInfo?.route_mkt
-                          } 
-                        })}
-                      >
-                        Choose This Station
-                      </button>
-                    </div>
-                  </div>
+                {stops.map((stop) => (
+                  <RouteStopCard
+                    key={stop.id || stop._id}
+                    stop={stop}
+                    routeInfo={routeInfo}
+                    locationState={location.state}
+                  />
                 ))}
               </div>
             </div>
           ) : (
-            <div>No stops found for this route.</div>
+            <EmptyState message="No stops found for this route." />
           )}
         </div>
       </main>
@@ -112,4 +62,4 @@ const BusLineRoute = () => {
   );
 };
 
-export default BusLineRoute; 
+export default BusLineRoute;

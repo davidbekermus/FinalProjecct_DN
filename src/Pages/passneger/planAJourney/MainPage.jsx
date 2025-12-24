@@ -10,20 +10,8 @@ import FilterByline from './components/FilterByline';
 import FilterByStation from './components/FilterByStation';
 import FilterByCompany from './components/FilterByCompany';
 import ResultsDisplay from './components/ResultsDisplay';
+import { removeDuplicates } from './utils/dataUtils';
 import '../../../Css/planAjourney/MainPage.css';
-
-// Deduplicate by agency_name (case-insensitive)
-const removeDuplicates = (data) => {
-  const seen = new Set();
-  return data.filter((company) => {
-    const key = company.agency_name?.toLowerCase() || "";
-    if (seen.has(key)) {
-      return false;
-    }
-    seen.add(key);
-    return true;
-  });
-};
 
 const MainPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
